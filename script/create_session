@@ -18,13 +18,20 @@ def main():
     """Creates a new tmux session if it does not yet exist"""
     rospy.init_node('create_catmux_session', anonymous=True)
     session_name = rospy.get_param('~session_name', 'catmux')
-    if safe_call(['tmux', 'has-session', '-t', session_name]):
+    try:
+        subprocess.check_call(['tmux', 'has-session', '-t', session_name])
         rospy.logwarn('Session with name "%s" already exists. Not overwriting session.',
                       session_name)
         sys.exit(0)
+    except subprocess.CalledProcessError:
+        # When has-session returns non-zero exit code, the session already exists or there is
+        # probably something severely wrong. TODO: This could be done better probably
+        pass
 
     if not safe_call(['tmux', 'new-session', '-s', session_name, '-d']):
         sys.exit(1)
+
+    rospy.loginfo('Created session "{}"'.format(session_name))
 
 if __name__ == "__main__":
     main()
