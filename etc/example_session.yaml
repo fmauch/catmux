@@ -1,11 +1,49 @@
 ---
 common:
   before_commands:
-    - fzirob change_environment
+    - fzirob change_environment # before commands can be specified global and per window
+  default_window: README # This window will be visible when first attaching to the session
 windows:
   - name: roscore
+    splits:
+      - commands:
+        - roscore
+    delay: 1 # Use this to wait before starting the next window
+  - name: tiled
+    layout: tiled
+    splits:
+      - commands:
+        - echo "hello"
+        - echo "world"
+      - commands:
+        - echo "1"
+      - commands:
+        - echo "2"
+      - commands:
+        - echo "3"
+      - commands:
+        - echo "4"
+  - name: left-right
+    layout: even-vertical
+    splits:
+      - commands:
+        - echo "left"
+      - commands:
+        - echo "right"
+  - name: top-bottom
+    layout: even-horizontal
+    splits:
+      - commands:
+        - echo "top"
+      - commands:
+        - echo "bottom"
+  - name: README
+    commands: # This looks a bit weird, but gives nicer colors
+      - clear && tput bold && tput setaf 6 && roscat catmux readme_tmux.txt
+      - tput sgr0
+  - name: no_split
+    # If just one split is desired, just skip it
     commands:
       - echo "hello"
-  - name: spare
 
 

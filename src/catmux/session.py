@@ -24,6 +24,7 @@ from __future__ import print_function
 
 import yaml
 from window import Window
+import tmux_wrapper as tmux
 
 
 class Session(object):
@@ -52,7 +53,6 @@ class Session(object):
         """Initialize config directly by an already loaded yaml structure."""
 
         self.__yaml_data = yaml_data
-
         self._parse_common()
         self._parse_windows()
 
@@ -62,10 +62,14 @@ class Session(object):
             print('No windows to run found')
             return
 
+        first = True
         for window in self._windows:
-            window.debug()
-            window.create()
-            window.run()
+            window.create(first)
+            first = False
+
+        if 'default_window' in self._common:
+            tmux.tmux_call(['select-window', '-t', self._common['default_window']])
+
 
     def _parse_common(self):
         if self.__yaml_data is None:
@@ -82,19 +86,12 @@ class Session(object):
 
         if 'windows' in self.__yaml_data:
             for window in self.__yaml_data['windows']:
-                commands = list()
-                before_commands = list()
+                kwargs = dict()
                 if 'before_commands' in self._common:
-                    before_commands = self._common['before_commands']
+                    kwargs['before_commands'] = self._common['before_commands']
 
-                if 'commands' in window:
-                    commands = window['commands']
-                if 'before_commands' in window:
-                    before_commands = window['before_commands']
-                self._windows.append(
-                    Window(
-                        window['name'],
-                        commands=commands,
-                        before_commands=before_commands))
+                kwargs.update(window)
+
+                self._windows.append(Window(**kwargs))
         else:
             print('No window section found in session config')

@@ -18,32 +18,31 @@
 
 # -- END LICENSE BLOCK ------------------------------------------------
 
-"""Wraps usage of tmux commands"""
+"""A split in a tmux session"""
 from __future__ import print_function
 
-import subprocess
+import tmux_wrapper as tmux
 
-def send_keys(command):
-    """Executes a command in the current tmux pane"""
 
-    tmux_call(['send-keys', command, 'C-m'])
+class Split(object):
 
-def split():
-    """Splits the current pane into two"""
-    tmux_call(['split-window'])
+    """A split is a pane where commands can be executed"""
 
-def tmux_call(command_list):
-    """Executes a tmux command """
-    tmux_cmd = ['tmux'] + command_list
+    def __init__(self, **kwargs):
+        """TODO: to be defined1. """
 
-    print(' '.join(tmux_cmd))
-    _safe_call(tmux_cmd)
+        if kwargs is not None:
+            for key, value in kwargs.iteritems():
+                setattr(self, key, value)
 
-def _safe_call(cmd_list):
-    """Makes a subprocess check_call and outputs a clear error message on failure and then exits"""
-    try:
-        subprocess.check_output(cmd_list)
-        return True
-    except subprocess.CalledProcessError as err_thrown:
-        print('Error while calling "%s"', err_thrown.cmd)
-        return False
+    def debug(self, name='', prefix=''):
+        """Prints all information about this window"""
+        print(prefix + '- Split ' + name + ':')
+        if hasattr(self, 'commands'):
+            print(prefix + '  commands: ')
+            print('\t- ' + '\n\t- '.join(getattr(self, 'commands')))
+
+    def run(self):
+        "Executes all configured commands"""
+        for command in getattr(self, 'commands'):
+            tmux.send_keys(command)
