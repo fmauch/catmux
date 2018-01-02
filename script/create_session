@@ -49,6 +49,10 @@ def parse_arguments(debug=False):
                         help="This config will be used for the tmux session")
     parser.add_argument('-d', '--detach', action='store_true',
                         help="Start session in detached mode")
+    parser.add_argument('--overwrite',
+                        help="Overwrite a parameter from the session config. Parameters can be "
+                             "specified using a comma-separated list such as '--overwrite "
+                             "param_a=1,param_b=2'.")
 
     args = parser.parse_args()
     if debug:
@@ -60,7 +64,7 @@ def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
-    session_config = CatmuxSession()
+    session_config = CatmuxSession(args.overwrite)
     session_config.init_from_filepath(args.session_config)
 
     try:

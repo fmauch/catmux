@@ -36,7 +36,7 @@ def tmux_call(command_list):
     """Executes a tmux command """
     tmux_cmd = ['tmux'] + command_list
 
-    print(' '.join(tmux_cmd))
+    # print(' '.join(tmux_cmd))
     _safe_call(tmux_cmd)
 
 def _safe_call(cmd_list):

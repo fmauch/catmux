@@ -3,6 +3,9 @@ common:
   before_commands:
     - fzirob change_environment # before commands can be specified global and per window
   default_window: README # This window will be visible when first attaching to the session
+parameters:
+  show_layouts: false
+  replacement_param: world\!
 windows:
   - name: roscore
     splits:
@@ -10,6 +13,7 @@ windows:
         - roscore
     delay: 1 # Use this to wait before starting the next window
   - name: tiled
+    if: show_layouts
     layout: tiled
     splits:
       - commands:
@@ -24,6 +28,7 @@ windows:
       - commands:
         - echo "4"
   - name: left-right
+    if: show_layouts
     layout: even-vertical
     splits:
       - commands:
@@ -31,6 +36,7 @@ windows:
       - commands:
         - echo "right"
   - name: top-bottom
+    if: show_layouts
     layout: even-horizontal
     splits:
       - commands:
@@ -42,8 +48,9 @@ windows:
       - clear && tput bold && tput setaf 6 && roscat catmux readme_tmux.txt
       - tput sgr0
   - name: no_split
+    unless: show_layouts
     # If just one split is desired, just skip it
     commands:
-      - echo "hello"
+      - echo "hello ${replacement_param}"
 
 

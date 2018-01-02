@@ -48,8 +48,6 @@ class Window(object):
             for key, value in kwargs.iteritems():
                 setattr(self, key, value)
 
-        self.debug()
-
 
     def debug(self):
         """Prints all information about this window"""
