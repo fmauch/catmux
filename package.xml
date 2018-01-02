@@ -45,9 +45,7 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>catkin_pkg</build_depend>
   <build_depend>rospy</build_depend>
-  <exec_depend>catkin_pkg</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>tmux</exec_depend>
 

@@ -1,0 +1,11 @@
+---
+common:
+  before_commands:
+    - fzirob change_environment
+windows:
+  - name: roscore
+    commands:
+      - echo "hello"
+  - name: spare
+
+

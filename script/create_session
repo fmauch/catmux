@@ -3,7 +3,10 @@ from __future__ import print_function
 import subprocess
 import sys
 
-import rospy
+import argparse
+
+from catmux.session import Session as CatmuxSession
+
 
 def safe_call(cmd_list):
     """Makes a subprocess check_call and outputs a clear error message on failure and then exits"""
@@ -11,27 +14,59 @@ def safe_call(cmd_list):
         subprocess.check_output(cmd_list)
         return True
     except subprocess.CalledProcessError as err_thrown:
-        rospy.logerr('Error while calling "%s"', err_thrown.cmd)
+        print('Error while calling "%s"', err_thrown.cmd)
         return False
+
+
+def parse_arguments(debug=False):
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='Create a new catmux session')
+    parser.add_argument('session_config', metavar='config',
+                        help="Session configuration. Should be a yaml-file.")
+    parser.add_argument('-n', '--session_name', default='catmux',
+                        help="Name used for the tmux session")
+    parser.add_argument('-t', '--tmux_config',
+                        help="This config will be used for the tmux session")
+    parser.add_argument('-d', '--detach', action='store_true',
+                        help="Start session in detached mode")
+
+    args = parser.parse_args()
+    if debug:
+        print(args)
+    return args
+
 
 def main():
     """Creates a new tmux session if it does not yet exist"""
-    rospy.init_node('create_catmux_session', anonymous=True)
-    session_name = rospy.get_param('~session_name', 'catmux')
+    args = parse_arguments()
+
+    session_config = CatmuxSession()
+    session_config.init_from_filepath(args.session_config)
+
     try:
-        subprocess.check_call(['tmux', 'has-session', '-t', session_name])
-        rospy.logwarn('Session with name "%s" already exists. Not overwriting session.',
-                      session_name)
+        subprocess.check_call(['tmux', 'has-session', '-t', args.session_name])
+        print('Session with name "{}" already exists. Not overwriting session.'.format(
+            args.session_name))
         sys.exit(0)
     except subprocess.CalledProcessError:
         # When has-session returns non-zero exit code, the session already exists or there is
         # probably something severely wrong. TODO: This could be done better probably
         pass
 
-    if not safe_call(['tmux', 'new-session', '-s', session_name, '-d']):
+    command = ['tmux']
+    if args.tmux_config:
+        command += ['-f', args.tmux_config]
+    command += ['new-session', '-s', args.session_name]
+    command.append('-d')
+    if not safe_call(command):
         sys.exit(1)
 
-    rospy.loginfo('Created session "{}"'.format(session_name))
+    print('Created session "{}"'.format(args.session_name))
+
+    session_config.run()
+    if not args.detach:
+        safe_call(['tmux', 'attach', '-t', args.session_name])
+
 
 if __name__ == "__main__":
     main()
