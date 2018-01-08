@@ -127,9 +127,10 @@ class Session(object):
                 data[index] = self._replace_parameters(item)
         elif isinstance(data, str):
             for key, value in self._parameters.items():
-                if isinstance(value, str):
-                    # print('replacing {} in {}'.format(key, data))
-                    data = re.sub(r"\${%s}"%(key), value, data)
+                # print('-\nValue {}: {}\n='.format(value, type(data)))
+                # if isinstance(value, str):
+                # print('replacing {} in {}'.format(key, data))
+                data = re.sub(r"\${%s}"%(key), str(value), data)
         return data
 
 
