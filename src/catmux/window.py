@@ -77,4 +77,6 @@ class Window(object):
             tmux.tmux_call(['select-layout', getattr(self, 'layout')])
 
         if hasattr(self, 'delay'):
+            print('Window {} requested delay of {} seconds'
+                    .format(getattr(self, 'name'), getattr(self, 'delay')))
             time.sleep(getattr(self, 'delay'))

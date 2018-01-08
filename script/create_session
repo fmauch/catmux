@@ -98,9 +98,11 @@ def main():
 
     command = ['tmux']
     if args.tmux_config:
+        print('Using tmux config file: {}'.format(resolve_path(args.tmux_config)))
         command += ['-f', resolve_path(args.tmux_config)]
     command += ['new-session', '-s', args.session_name]
     command.append('-d')
+    print(' '.join(command))
     if not safe_call(command):
         sys.exit(1)
 
