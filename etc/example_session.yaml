@@ -1,11 +1,19 @@
 ---
 common:
+  # before_commands will be executed in each pane before doing anything else. Use this e.g. for
+  #   - sourcing an environment
+  #   - ssh-ing to another machine
   before_commands:
-    - fzirob change_environment # before commands can be specified global and per window
-  default_window: README # This window will be visible when first attaching to the session
+    - echo "This is a catmux window :)" # before commands can be specified global and per window
+
+  # The default window will be the one displayed when first connecting to the tmux session
+  default_window: README
 parameters:
-  show_layouts: false
-  replacement_param: world\!
+  # Parameters specified here can be used below and they can be overwritten at runtime
+  show_layouts: false # This parameter is used together with the if flag below
+  replacement_param: world\! # Parameters can also be used as replacement templates
+
+# Everything will be opened in windows. Windows can have multiple splits.
 windows:
   - name: roscore
     splits:
@@ -13,8 +21,8 @@ windows:
         - roscore
     delay: 1 # Use this to wait before starting the next window
   - name: tiled
-    if: show_layouts
-    layout: tiled
+    if: show_layouts # this window will only be started when the 'show_layouts' parameter is true
+    layout: tiled # One can use the default layouts specified by tmux
     splits:
       - commands:
         - echo "hello"
@@ -44,12 +52,14 @@ windows:
       - commands:
         - echo "bottom"
   - name: README
-    commands: # This looks a bit weird, but gives nicer colors
-      - clear && tput bold && tput setaf 6 && roscat catmux readme_tmux.txt
-      - tput sgr0
+    splits:
+      - commands:
+        # This looks a bit weird, but gives nicer colors
+        - clear && tput bold && tput setaf 6 && roscat catmux readme_tmux.txt
+        - tput sgr0
   - name: no_split
-    unless: show_layouts
-    # If just one split is desired, just skip it
+    unless: show_layouts # This window will only be displayed if 'show_layouts' is false
+    # If just one split is desired, just skip it and write the commands directly
     commands:
       - echo "hello ${replacement_param}"
 
