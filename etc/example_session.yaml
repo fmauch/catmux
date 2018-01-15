@@ -29,7 +29,7 @@ windows:
         - echo "4"
   - name: left-right
     if: show_layouts
-    layout: even-vertical
+    layout: even-horizontal
     splits:
       - commands:
         - echo "left"
@@ -37,7 +37,7 @@ windows:
         - echo "right"
   - name: top-bottom
     if: show_layouts
-    layout: even-horizontal
+    layout: even-vertical
     splits:
       - commands:
         - echo "top"
