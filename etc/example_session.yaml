@@ -25,8 +25,8 @@ windows:
     layout: tiled # One can use the default layouts specified by tmux
     splits:
       - commands:
-        - echo "hello"
-        - echo "world"
+        - echo "catmux with multiple commands"
+        - echo "hello ${replacement_param}"
       - commands:
         - echo "1"
       - commands:
