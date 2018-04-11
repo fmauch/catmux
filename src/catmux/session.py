@@ -29,6 +29,8 @@ import tmux_wrapper as tmux
 
 
 def check_boolean_field(boolean):
+    if isinstance(boolean, bool):
+        return boolean
     return boolean.lower() in ("yes", "true", "t", "1", True)
 
 
