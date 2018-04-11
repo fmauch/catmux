@@ -28,6 +28,10 @@ from window import Window
 import tmux_wrapper as tmux
 
 
+def check_boolean_field(boolean):
+    return boolean.lower() in ("yes", "true", "t", "1", True)
+
+
 class Session(object):
 
     """Parser for a config yaml file"""
@@ -143,12 +147,12 @@ class Session(object):
         if 'windows' in self.__yaml_data:
             for window in self.__yaml_data['windows']:
                 if 'if' in window:
-                    print('Detected of condition for window ' + window['name'])
+                    print('Detected if condition for window ' + window['name'])
                     if window['if'] not in self._parameters:
                         print('Skipping window ' + window['name'] + ' because parameter ' +
                               window['if'] + ' was not found.')
                         continue
-                    elif not self._parameters[window['if']]:
+                    elif not check_boolean_field(self._parameters[window['if']]):
                         print('Skipping window ' + window['name'] + ' because parameter ' +
                               window['if'] + ' is switched off globally')
                         continue
@@ -157,7 +161,7 @@ class Session(object):
                               .format(window['if'], self._parameters[window['if']]))
                 if 'unless' in window:
                     print('Detected unless condition for window ' + window['name'])
-                    if self._parameters[window['unless']]:
+                    if check_boolean_field(self._parameters[window['unless']]):
                         print('Skipping window ' + window['name'] + ' because parameter ' +
                               window['unless'] + ' is switched on globally')
                         continue
