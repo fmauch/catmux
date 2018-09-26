@@ -32,10 +32,11 @@ class Session(object):
 
     """Parser for a config yaml file"""
 
-    def __init__(self, runtime_params=None):
+    def __init__(self, session_name, runtime_params=None):
         """TODO: to be defined1. """
 
         self._common = dict()
+        self._session_name = session_name
         self._parameters = dict()
         self._runtime_params = self._parse_overwrites(runtime_params)
         self._windows = list()
@@ -68,7 +69,7 @@ class Session(object):
 
         first = True
         for window in self._windows:
-            window.create(first)
+            window.create(self._session_name, first)
             if debug:
                 window.debug()
             first = False

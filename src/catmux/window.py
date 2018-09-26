@@ -59,7 +59,7 @@ class Window(object):
         for counter, split in enumerate(self.splits):
             split.debug(name=str(counter), prefix=' ')
 
-    def create(self, first=False):
+    def create(self, session_name, first=False):
         """Creates the window"""
         if not first:
             tmux.tmux_call(['new-window'])
