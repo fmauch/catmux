@@ -2,7 +2,7 @@
 <package format="2">
   <name>catmux</name>
   <version>0.0.0</version>
-  <description>The catmux package</description>
+  <description>Catmux: Catkin and Tmux. Catmux is a ROS package to enable the user to start a tmux session with multiple launch files and scripts with ease.</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -51,6 +51,7 @@
   <exec_depend>python-yaml</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>tmux</exec_depend>
+  <build_export_depend>rospy</build_export_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
