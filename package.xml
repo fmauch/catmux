@@ -45,6 +45,8 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
   <exec_depend>python-argparse</exec_depend>
   <exec_depend>python-catkin-pkg</exec_depend>
   <exec_depend>python-yaml</exec_depend>
