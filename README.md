@@ -86,3 +86,16 @@ rosrun catmux create_session package://catmux/etc/example_session.yaml --tmux_co
 If you are not that familiar with tmux: To kill a session, simply type `tmux kill-session` in any
 terminal window. In the `etc/tmux_default.conf` there is a key-binding for that, see
 `etc/readme_tmux.txt` for details.
+
+## Usage ROS2
+Only available in the ros2 branch of this repository!
+
+### Installation
+Very similar to ROS1: simply clone the package into your ROS2-workspace, build it and
+you're done.
+
+### Usage (full blown example)
+In case you are not in the base directory of your ROS2 workspace while running this command, don't forget to set correct paths!
+```
+ros2 run catmux create_session $PWD/src/catmux/etc/example_session.yaml --tmux_config $PWD/src/catmux/etc/tmux_default.conf --session_name example_session --overwrite show_layouts=True,replacement_param="new catmux user"
+```
