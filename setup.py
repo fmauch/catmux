@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import setup
 
-package_info = generate_distutils_setup(
-    packages=['catmux'],
+package_name = 'catmux'
+
+setup( name=package_name,
+    packages=[package_name],
+    data_files=[
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+    ],
+    install_requires=['setuptools'],
     scripts=['script/create_session'],
     package_dir={'': 'src'}
 )
-
-setup(**package_info)
