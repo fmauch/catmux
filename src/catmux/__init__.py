@@ -20,5 +20,5 @@
 
 """Loads all modules from other files"""
 
-from window import Window
-from session import Session
+from catmux.window import Window
+from catmux.session import Session

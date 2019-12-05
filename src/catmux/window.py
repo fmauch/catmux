@@ -19,12 +19,12 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Contains the Window object"""
-from __future__ import print_function
+
 
 import time
 
-import tmux_wrapper as tmux
-from split import Split
+import catmux.tmux_wrapper as tmux
+from catmux.split import Split
 
 
 class Window(object):
@@ -45,7 +45,7 @@ class Window(object):
             self.splits.append(Split(**split_data))
 
         if kwargs is not None:
-            for key, value in kwargs.iteritems():
+            for key, value in kwargs.items():
                 setattr(self, key, value)
 
 

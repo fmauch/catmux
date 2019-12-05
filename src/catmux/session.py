@@ -19,13 +19,13 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Contains everything around the config file"""
-from __future__ import print_function
+
 
 import re
 import yaml
 
-from window import Window
-import tmux_wrapper as tmux
+from catmux.window import Window
+import catmux.tmux_wrapper as tmux
 
 
 def check_boolean_field(boolean):
@@ -52,7 +52,7 @@ class Session(object):
         """Initializes the data from a file read from filepath."""
 
         try:
-            self.__yaml_data = yaml.load(file(filepath, 'r'))
+            self.__yaml_data = yaml.load(open(filepath, 'r'))
         except yaml.YAMLError as exc:
             print('Error while loading config file: %s', exc)
             print('Loaded file was: %s', filepath)
@@ -114,11 +114,11 @@ class Session(object):
 
         print('Parameters found in session config:')
         print(' - ' + '\n - '.join('{} = {}'.format(key, value)
-                                   for key, value in self._parameters.items()))
+                                   for key, value in list(self._parameters.items())))
         if self._runtime_params:
             print('Parameters found during runtime (overwrites):')
             print(' - ' + '\n - '.join('{} = {}'.format(key, value)
-                                       for key, value in self._runtime_params.items()))
+                                       for key, value in list(self._runtime_params.items())))
             # Overwrite parameters given from command line
             self._parameters.update(self._runtime_params)
 
@@ -127,13 +127,13 @@ class Session(object):
 
     def _replace_parameters(self, data):
         if isinstance(data, dict):
-            for key, value in data.items():
+            for key, value in list(data.items()):
                 data[key] = self._replace_parameters(value)
         elif isinstance(data, list):
             for index, item in enumerate(data):
                 data[index] = self._replace_parameters(item)
         elif isinstance(data, str):
-            for key, value in self._parameters.items():
+            for key, value in list(self._parameters.items()):
                 # print('-\nValue {}: {}\n='.format(value, type(data)))
                 # if isinstance(value, str):
                 # print('replacing {} in {}'.format(key, data))
