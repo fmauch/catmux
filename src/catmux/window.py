@@ -19,7 +19,9 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Contains the Window object"""
+from __future__ import print_function, absolute_import
 
+from future.utils import iteritems
 
 import time
 
@@ -45,7 +47,7 @@ class Window(object):
             self.splits.append(Split(**split_data))
 
         if kwargs is not None:
-            for key, value in kwargs.items():
+            for (key, value) in iteritems (kwargs):
                 setattr(self, key, value)
 
 
