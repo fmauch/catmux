@@ -19,6 +19,7 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Loads all modules from other files"""
+from __future__ import absolute_import
 
-from window import Window
-from session import Session
+from catmux.window import Window
+from catmux.session import Session
