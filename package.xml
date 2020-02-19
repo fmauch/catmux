@@ -52,7 +52,7 @@
   <exec_depend>python-yaml</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>tmux</exec_depend>
-  <exec_depend>future</exec_depend>
+  <exec_depend>python-future</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
