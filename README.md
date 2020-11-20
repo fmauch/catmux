@@ -97,5 +97,5 @@ you're done.
 ### Usage (full blown example)
 In case you are not in the base directory of your ROS2 workspace while running this command, don't forget to set correct paths!
 ```
-ros2 run catmux create_session $PWD/src/catmux/etc/example_session.yaml --tmux_config $PWD/src/catmux/etc/tmux_default.conf --session_name example_session --overwrite show_layouts=True,replacement_param="new catmux user"
+ros2 run catmux create_session package://catmux/etc/example_session.yaml --tmux_config package://catmux/etc/tmux_default.conf --session_name example_session --overwrite show_layouts=True,replacement_param="new catmux user"
 ```

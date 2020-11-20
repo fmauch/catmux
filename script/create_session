@@ -24,7 +24,7 @@ import os
 import subprocess
 import sys
 
-import rospkg
+from ament_index_python.packages import get_package_share_directory
 
 import argparse
 
@@ -66,16 +66,16 @@ def parse_arguments(debug=False):
 def resolve_path(path_string):
     """Resolves a package:// path string"""
     if path_string.find('package://') >= 0:
-        rospack = rospkg.RosPack()
         relevant_path = path_string.split('://')[1]
         split_path = relevant_path.split('/', 1)
         try:
-            package_path = rospack.get_path(split_path[0])
-        except rospkg.ResourceNotFound:
+            package_share_directory = get_package_share_directory(split_path[0])
+            print('Found package share directory of package "{0}" at {1}'.format(split_path[0], package_share_directory))
+        except:
             print('ERROR: Package with name "{}" could not be found'.
                   format(split_path[0]))
             sys.exit(1)
-        path_string = os.path.join(package_path, split_path[1])
+        path_string = os.path.join(package_share_directory, split_path[1])
     return path_string
 
 def main():
@@ -98,8 +98,9 @@ def main():
 
     command = ['tmux']
     if args.tmux_config:
-        print('Using tmux config file: {}'.format(resolve_path(args.tmux_config)))
-        command += ['-f', resolve_path(args.tmux_config)]
+        tmux_path = resolve_path(args.tmux_config)
+        print('Using tmux config file: {}'.format(tmux_path))
+        command += ['-f', tmux_path]
     command += ['new-session', '-s', args.session_name]
     command.append('-d')
     print(' '.join(command))
