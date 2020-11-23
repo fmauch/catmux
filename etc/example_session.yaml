@@ -51,12 +51,6 @@ windows:
         - echo "top"
       - commands:
         - echo "bottom"
-  - name: README
-    splits:
-      - commands:
-        # This looks a bit weird, but gives nicer colors
-        - clear && tput bold && tput setaf 6 && roscat catmux readme_tmux.txt
-        - tput sgr0
   - name: no_split
     unless: show_layouts # This window will only be displayed if 'show_layouts' is false
     # If just one split is desired, just skip it and write the commands directly

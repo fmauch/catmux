@@ -1,12 +1,27 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+import setuptools
 
-package_info = generate_distutils_setup(
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name="catmux",
+    version="0.0.1",
+    license="MIT",
+    author="Felix Exner",
+    author_email="felix_mauch@web.de",
+    description="A tmux orchestration package.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/fmauch/catmux",
     packages=['catmux'],
-    scripts=['script/create_session'],
-    package_dir={'': 'src'}
+    scripts=['script/catmux_create_session'],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    install_requires=['yaml'],
+    python_requires='>=3.6',
 )
-
-setup(**package_info)

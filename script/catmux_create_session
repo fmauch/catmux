@@ -68,28 +68,13 @@ def parse_arguments(debug=False):
     return args
 
 
-def resolve_path(path_string):
-    """Resolves a package:// path string"""
-    if path_string.find('package://') >= 0:
-        rospack = rospkg.RosPack()
-        relevant_path = path_string.split('://')[1]
-        split_path = relevant_path.split('/', 1)
-        try:
-            package_path = rospack.get_path(split_path[0])
-        except rospkg.ResourceNotFound:
-            print('ERROR: Package with name "{}" could not be found'.
-                  format(split_path[0]))
-            sys.exit(1)
-        path_string = os.path.join(package_path, split_path[1])
-    return path_string
-
 def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
 
     session_config = CatmuxSession(args.session_name, args.overwrite)
-    session_config.init_from_filepath(resolve_path(args.session_config))
+    session_config.init_from_filepath(args.session_config)
 
     try:
         subprocess.check_call(['tmux', 'has-session', '-t', args.session_name])
@@ -103,8 +88,8 @@ def main():
 
     command = ['tmux']
     if args.tmux_config:
-        print('Using tmux config file: {}'.format(resolve_path(args.tmux_config)))
-        command += ['-f', resolve_path(args.tmux_config)]
+        print('Using tmux config file: {}'.format(args.tmux_config))
+        command += ['-f', args.tmux_config]
     command += ['new-session', '-s', args.session_name]
     command.append('-d')
     print(' '.join(command))
