@@ -7,7 +7,7 @@ common:
     - echo "This is a catmux window :)" # before commands can be specified global and per window
 
   # The default window will be the one displayed when first connecting to the tmux session
-  default_window: README
+  default_window: some_other_window
 parameters:
   # Parameters specified here can be used below and they can be overwritten at runtime
   show_layouts: false # This parameter is used together with the if flag below
@@ -15,11 +15,6 @@ parameters:
 
 # Everything will be opened in windows. Windows can have multiple splits.
 windows:
-  - name: roscore
-    splits:
-      - commands:
-        - roscore
-    delay: 1 # Use this to wait before starting the next window
   - name: tiled
     if: show_layouts # this window will only be started when the 'show_layouts' parameter is true
     layout: tiled # One can use the default layouts specified by tmux
@@ -56,5 +51,8 @@ windows:
     # If just one split is desired, just skip it and write the commands directly
     commands:
       - echo "hello ${replacement_param}"
-
-
+    delay: 1 # Use this to wait before starting the next window
+  - name: some_other_window
+    commands:
+      - echo "You landed in your default_window"
+      - echo "hello ${replacement_param}"

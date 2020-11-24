@@ -39,17 +39,18 @@ one central spot on a particular machine.
 
 ## Installation
 Catmux is a pure python package and as such it is installable via pip.
-After cloning this repository call `pip install --user -e .` in the repository's root directory.
+After cloning this repository call `pip install --user .` in the repository's root directory.
 
 ## Usage
 Currently, there is no full-blown documentation, but the example config file in
 `etc/example_session.yaml` gives a detailed insight on possible commands.
 
 ### Running the example the most simple way
-After installation, you can run a simple example by calling the following command in the
-repository's root directory.
+After installation, you can run a simple example by calling the following command from outside the
+repositories directory.
 ```
-catmux_create_session etc/example_session.yaml
+# leave the repository, e.g. by calling 'cd'
+catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml
 ```
 
 To see further options, simply run it with argument `-h`:
@@ -76,10 +77,14 @@ optional arguments:
 ```
 
 ### Full blown example
-To make use of all catmux features, run the following example command, again from the root
-directory:
+To make use of all catmux features, run the following example command from outside the
+repositories directory:
 ```
-catmux_create_session etc/example_session.yaml --tmux_config etc/tmux_default.conf --session_name example_session --overwrite show_layouts=True,replacement_param="new catmux user"
+# leave the repository, e.g. by calling 'cd'
+catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml \
+  --tmux_config $(python3 -m catmux.prefix)/share/catmux/tmux_default.conf \
+  --session_name example_session \
+  --overwrite show_layouts=True,replacement_param="new catmux user"
 ```
 
 ### Killing a catmux session
