@@ -27,6 +27,7 @@
 from __future__ import print_function
 import os
 import subprocess
+import site
 import sys
 
 import rospkg
@@ -34,6 +35,7 @@ import rospkg
 import argparse
 
 from catmux.session import Session as CatmuxSession
+from catmux.prefix import get_prefix
 
 
 def safe_call(cmd_list):
@@ -68,28 +70,12 @@ def parse_arguments(debug=False):
     return args
 
 
-def resolve_path(path_string):
-    """Resolves a package:// path string"""
-    if path_string.find('package://') >= 0:
-        rospack = rospkg.RosPack()
-        relevant_path = path_string.split('://')[1]
-        split_path = relevant_path.split('/', 1)
-        try:
-            package_path = rospack.get_path(split_path[0])
-        except rospkg.ResourceNotFound:
-            print('ERROR: Package with name "{}" could not be found'.
-                  format(split_path[0]))
-            sys.exit(1)
-        path_string = os.path.join(package_path, split_path[1])
-    return path_string
-
 def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
-
     session_config = CatmuxSession(args.session_name, args.overwrite)
-    session_config.init_from_filepath(resolve_path(args.session_config))
+    session_config.init_from_filepath(args.session_config)
 
     try:
         subprocess.check_call(['tmux', 'has-session', '-t', args.session_name])
@@ -103,8 +89,18 @@ def main():
 
     command = ['tmux']
     if args.tmux_config:
-        print('Using tmux config file: {}'.format(resolve_path(args.tmux_config)))
-        command += ['-f', resolve_path(args.tmux_config)]
+        tmux_config = args.tmux_config
+    elif os.path.exists(os.path.expanduser("~/.tmux.conf")):
+        tmux_config = os.path.expanduser("~/.tmux.conf")
+    elif os.path.exists("/etc/tmux.conf"):
+        tmux_config = "/etc/tmux.conf"
+    else:
+        prefix = get_prefix()
+        tmux_config = os.path.join(prefix,  'share', 'catmux', 'tmux_default.conf')
+
+    print('Using tmux config file: {}'.format(tmux_config))
+    command += ['-f', tmux_config]
+
     command += ['new-session', '-s', args.session_name]
     command.append('-d')
     print(' '.join(command))

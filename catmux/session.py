@@ -24,8 +24,6 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Contains everything around the config file"""
-from __future__ import print_function, absolute_import
-
 import re
 import yaml
 
