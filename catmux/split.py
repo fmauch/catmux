@@ -24,9 +24,6 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """A split in a tmux session"""
-from __future__ import print_function, absolute_import
-
-from future.utils import iteritems
 
 import catmux.tmux_wrapper as tmux
 
@@ -39,7 +36,7 @@ class Split(object):
         """TODO: to be defined1. """
 
         if kwargs is not None:
-            for (key, value) in iteritems(kwargs):
+            for (key, value) in kwargs.items():
                 setattr(self, key, value)
 
     def debug(self, name='', prefix=''):

@@ -39,7 +39,7 @@ one central spot on a particular machine.
 
 ## Installation
 Catmux is a pure python package and as such it is installable via pip.
-After cloning this repository call `pip install --user .` in the repository's root directory.
+After cloning this repository call `pip3 install --user .` in the repository's root directory.
 
 ## Usage
 Currently, there is no full-blown documentation, but the example config file in

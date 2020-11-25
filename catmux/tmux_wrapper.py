@@ -24,8 +24,6 @@
 # -- END LICENSE BLOCK ------------------------------------------------
 
 """Wraps usage of tmux commands"""
-from __future__ import print_function
-
 import subprocess
 
 def send_keys(command):

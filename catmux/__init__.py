@@ -23,8 +23,3 @@
 # SOFTWARE.
 # -- END LICENSE BLOCK ------------------------------------------------
 
-"""Loads all modules from other files"""
-from __future__ import absolute_import
-
-from catmux.window import Window
-from catmux.session import Session
