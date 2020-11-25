@@ -8,18 +8,6 @@ which is in my opinion kind of an overhead.
 
 Session configs can be stored anywhere and have to be given as an argument.
 
-## DISCLAIMER - Early package
-This package is currently in development phase. It's interface might completely change and/or
-functionality might be moved around or even removed without notice. Use it at your own risks and
-report issues and problems :)
-
-However, by now it has been used productively in four different projects by different people without
-problems, so I would consider it 'working'.
-
-If you try out catmux and you find anything you're missing, anything that doesn't work as expected,
-or is clearly a bug, please create an issue here, I'll be happy to answer to them. Of course, merge
-requests are always welcome, as well :)
-
 ## Motivation
 In most of our ROS projects at work we use shell output for almost all nodes to get log information
 during runtime. Having all this in one window where you start your "Start it all"-launchfile makes
