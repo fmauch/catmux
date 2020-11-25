@@ -55,7 +55,7 @@ class Session(object):
         """Initializes the data from a file read from filepath."""
 
         try:
-            self.__yaml_data = yaml.load(open(filepath, 'r'))
+            self.__yaml_data = yaml.safe_load(open(filepath, 'r'))
         except yaml.YAMLError as exc:
             print('Error while loading config file: %s', exc)
             print('Loaded file was: %s', filepath)
