@@ -26,18 +26,21 @@ project and I definitely wanted something that saves the config per project and 
 one central spot on a particular machine.
 
 ## Installation
-Catmux is a pure python package and as such it is installable via pip.
-After cloning this repository call `pip3 install --user .` in the repository's root directory.
+Catmux is a pure python package and the installation via `pip3 install --user catmux` is recommended.
+
+You can also install it by cloning this repository and calling `pip3 install --user .` in the
+repository's root directory. If you use this option, please be aware that some examples behave
+differently if you have installed catmux this way and are calling it from the repository directory.
+Calling them from outside the directory (e.g. after leaving via `cd`) is fine and should result in
+the same behavior as with the recommended installation method.
 
 ## Usage
 Currently, there is no full-blown documentation, but the example config file in
 `etc/example_session.yaml` gives a detailed insight on possible commands.
 
 ### Running the example the most simple way
-After installation, you can run a simple example by calling the following command from outside the
-repositories directory.
+After installation, you can run a simple example by calling the following command:
 ```
-# leave the repository, e.g. by calling 'cd'
 catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml
 ```
 
@@ -65,10 +68,8 @@ optional arguments:
 ```
 
 ### Full blown example
-To make use of all catmux features, run the following example command from outside the
-repositories directory:
+To make use of all catmux features, run the following example command:
 ```
-# leave the repository, e.g. by calling 'cd'
 catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml \
   --tmux_config $(python3 -m catmux.prefix)/share/catmux/tmux_default.conf \
   --session_name example_session \
