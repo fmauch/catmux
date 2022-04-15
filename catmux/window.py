@@ -61,22 +61,23 @@ class Window(object):
         for counter, split in enumerate(self.splits):
             split.debug(name=str(counter), prefix=" ")
 
-    def create(self, session_name, first=False):
+    def create(self, server_name, session_name, first=False):
         """Creates the window"""
+        tmux_wrapper = tmux.TmuxWrapper(server_name=server_name)
         if not first:
-            tmux.tmux_call(["new-window"])
-        tmux.tmux_call(["rename-window", getattr(self, "name")])
+            tmux_wrapper.tmux_call(["new-window"])
+        tmux_wrapper.tmux_call(["rename-window", getattr(self, "name")])
         for counter, split in enumerate(self.splits):
             if counter > 0:
-                tmux.split()
+                tmux_wrapper.split()
 
             if hasattr(self, "before_commands"):
                 for cmd in getattr(self, "before_commands"):
-                    tmux.send_keys(cmd)
-            split.run()
+                    tmux_wrapper.send_keys(cmd)
+            split.run(server_name=server_name)
 
         if hasattr(self, "layout"):
-            tmux.tmux_call(["select-layout", getattr(self, "layout")])
+            tmux_wrapper.tmux_call(["select-layout", getattr(self, "layout")])
 
         if hasattr(self, "delay"):
             print(

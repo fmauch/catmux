@@ -46,7 +46,8 @@ class Split(object):
             print(prefix + "  commands: ")
             print("\t- " + "\n\t- ".join(getattr(self, "commands")))
 
-    def run(self):
+    def run(self, server_name):
         "Executes all configured commands" ""
+        tmux_wrapper = tmux.TmuxWrapper(server_name=server_name)
         for command in getattr(self, "commands"):
-            tmux.send_keys(command)
+            tmux_wrapper.send_keys(command)

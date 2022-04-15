@@ -70,7 +70,7 @@ class Session(object):
         self._parse_parameters()
         self._parse_windows()
 
-    def run(self, debug=False):
+    def run(self, server_name, debug=False):
         """Runs the loaded session"""
         if len(self._windows) == 0:
             print("No windows to run found")
@@ -78,13 +78,16 @@ class Session(object):
 
         first = True
         for window in self._windows:
-            window.create(self._session_name, first)
+            window.create(server_name, self._session_name, first)
             if debug:
                 window.debug()
             first = False
 
+        tmux_wrapper = tmux.TmuxWrapper(server_name)
         if "default_window" in self._common:
-            tmux.tmux_call(["select-window", "-t", self._common["default_window"]])
+            tmux_wrapper.tmux_call(
+                ["select-window", "-t", self._common["default_window"]]
+            )
 
     def _parse_common(self):
         if self.__yaml_data is None:
