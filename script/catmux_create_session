@@ -50,19 +50,25 @@ def safe_call(cmd_list):
 
 def parse_arguments(debug=False):
     """Parse command line arguments"""
-    parser = argparse.ArgumentParser(description='Create a new catmux session')
-    parser.add_argument('session_config',
-                        help="Session configuration. Should be a yaml-file.")
-    parser.add_argument('-n', '--session_name', default='catmux',
-                        help="Name used for the tmux session")
-    parser.add_argument('-t', '--tmux_config',
-                        help="This config will be used for the tmux session")
-    parser.add_argument('-d', '--detach', action='store_true',
-                        help="Start session in detached mode")
-    parser.add_argument('--overwrite',
-                        help="Overwrite a parameter from the session config. Parameters can be "
-                             "specified using a comma-separated list such as '--overwrite "
-                             "param_a=1,param_b=2'.")
+    parser = argparse.ArgumentParser(description="Create a new catmux session")
+    parser.add_argument(
+        "session_config", help="Session configuration. Should be a yaml-file."
+    )
+    parser.add_argument(
+        "-n", "--session_name", default="catmux", help="Name used for the tmux session"
+    )
+    parser.add_argument(
+        "-t", "--tmux_config", help="This config will be used for the tmux session"
+    )
+    parser.add_argument(
+        "-d", "--detach", action="store_true", help="Start session in detached mode"
+    )
+    parser.add_argument(
+        "--overwrite",
+        help="Overwrite a parameter from the session config. Parameters can be "
+        "specified using a comma-separated list such as '--overwrite "
+        "param_a=1,param_b=2'.",
+    )
 
     args = parser.parse_args()
     if debug:
@@ -78,16 +84,19 @@ def main():
     session_config.init_from_filepath(args.session_config)
 
     try:
-        subprocess.check_call(['tmux', 'has-session', '-t', args.session_name])
-        print('Session with name "{}" already exists. Not overwriting session.'.format(
-            args.session_name))
+        subprocess.check_call(["tmux", "has-session", "-t", args.session_name])
+        print(
+            'Session with name "{}" already exists. Not overwriting session.'.format(
+                args.session_name
+            )
+        )
         sys.exit(0)
     except subprocess.CalledProcessError:
         # When has-session returns non-zero exit code, the session already exists or there is
         # probably something severely wrong. TODO: This could be done better probably
         pass
 
-    command = ['tmux']
+    command = ["tmux"]
     if args.tmux_config:
         tmux_config = args.tmux_config
     elif os.path.exists(os.path.expanduser("~/.tmux.conf")):
@@ -96,14 +105,14 @@ def main():
         tmux_config = "/etc/tmux.conf"
     else:
         prefix = get_prefix()
-        tmux_config = os.path.join(prefix,  'share', 'catmux', 'tmux_default.conf')
+        tmux_config = os.path.join(prefix, "share", "catmux", "tmux_default.conf")
 
-    print('Using tmux config file: {}'.format(tmux_config))
-    command += ['-f', tmux_config]
+    print("Using tmux config file: {}".format(tmux_config))
+    command += ["-f", tmux_config]
 
-    command += ['new-session', '-s', args.session_name]
-    command.append('-d')
-    print(' '.join(command))
+    command += ["new-session", "-s", args.session_name]
+    command.append("-d")
+    print(" ".join(command))
     if not safe_call(command):
         sys.exit(1)
 
@@ -111,7 +120,7 @@ def main():
 
     session_config.run()
     if not args.detach:
-        safe_call(['tmux', 'attach', '-t', args.session_name])
+        safe_call(["tmux", "attach", "-t", args.session_name])
 
 
 if __name__ == "__main__":

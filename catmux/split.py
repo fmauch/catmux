@@ -33,20 +33,20 @@ class Split(object):
     """A split is a pane where commands can be executed"""
 
     def __init__(self, **kwargs):
-        """TODO: to be defined1. """
+        """TODO: to be defined1."""
 
         if kwargs is not None:
             for (key, value) in kwargs.items():
                 setattr(self, key, value)
 
-    def debug(self, name='', prefix=''):
+    def debug(self, name="", prefix=""):
         """Prints all information about this window"""
-        print(prefix + '- Split ' + name + ':')
-        if hasattr(self, 'commands'):
-            print(prefix + '  commands: ')
-            print('\t- ' + '\n\t- '.join(getattr(self, 'commands')))
+        print(prefix + "- Split " + name + ":")
+        if hasattr(self, "commands"):
+            print(prefix + "  commands: ")
+            print("\t- " + "\n\t- ".join(getattr(self, "commands")))
 
     def run(self):
-        "Executes all configured commands"""
-        for command in getattr(self, 'commands'):
+        "Executes all configured commands" ""
+        for command in getattr(self, "commands"):
             tmux.send_keys(command)

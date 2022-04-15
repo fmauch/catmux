@@ -42,7 +42,7 @@ class Session(object):
     """Parser for a config yaml file"""
 
     def __init__(self, session_name, runtime_params=None):
-        """TODO: to be defined1. """
+        """TODO: to be defined1."""
 
         self._common = dict()
         self._session_name = session_name
@@ -55,10 +55,10 @@ class Session(object):
         """Initializes the data from a file read from filepath."""
 
         try:
-            self.__yaml_data = yaml.safe_load(open(filepath, 'r'))
+            self.__yaml_data = yaml.safe_load(open(filepath, "r"))
         except yaml.YAMLError as exc:
-            print('Error while loading config file: %s', exc)
-            print('Loaded file was: %s', filepath)
+            print("Error while loading config file: %s", exc)
+            print("Loaded file was: %s", filepath)
 
         self.init_from_yaml(self.__yaml_data)
 
@@ -73,7 +73,7 @@ class Session(object):
     def run(self, debug=False):
         """Runs the loaded session"""
         if len(self._windows) == 0:
-            print('No windows to run found')
+            print("No windows to run found")
             return
 
         first = True
@@ -83,17 +83,16 @@ class Session(object):
                 window.debug()
             first = False
 
-        if 'default_window' in self._common:
-            tmux.tmux_call(['select-window', '-t', self._common['default_window']])
-
+        if "default_window" in self._common:
+            tmux.tmux_call(["select-window", "-t", self._common["default_window"]])
 
     def _parse_common(self):
         if self.__yaml_data is None:
-            print('parse_common was called without yaml data loaded.')
+            print("parse_common was called without yaml data loaded.")
             raise RuntimeError
 
-        if 'common' in self.__yaml_data:
-            self._common = self.__yaml_data['common']
+        if "common" in self.__yaml_data:
+            self._common = self.__yaml_data["common"]
 
     def _parse_overwrites(self, data_string):
         """Separates a comma-separated list of foo=val1,bar=val2 into a dictionary."""
@@ -101,30 +100,39 @@ class Session(object):
             return None
 
         overwrites = dict()
-        param_list = data_string.split(',')
+        param_list = data_string.split(",")
         for param in param_list:
-            key, value = param.split('=')
+            key, value = param.split("=")
             overwrites[key] = value
 
         return overwrites
 
     def _parse_parameters(self):
         if self.__yaml_data is None:
-            print('parse_parameters was called without yaml data loaded.')
+            print("parse_parameters was called without yaml data loaded.")
             raise RuntimeError
-        if 'parameters' in self.__yaml_data:
-            self._parameters = self.__yaml_data['parameters']
+        if "parameters" in self.__yaml_data:
+            self._parameters = self.__yaml_data["parameters"]
 
-        print('Parameters found in session config:')
-        print(' - ' + '\n - '.join('{} = {}'.format(key, value)
-                                   for key, value in list(self._parameters.items())))
+        print("Parameters found in session config:")
+        print(
+            " - "
+            + "\n - ".join(
+                "{} = {}".format(key, value)
+                for key, value in list(self._parameters.items())
+            )
+        )
         if self._runtime_params:
-            print('Parameters found during runtime (overwrites):')
-            print(' - ' + '\n - '.join('{} = {}'.format(key, value)
-                                       for key, value in list(self._runtime_params.items())))
+            print("Parameters found during runtime (overwrites):")
+            print(
+                " - "
+                + "\n - ".join(
+                    "{} = {}".format(key, value)
+                    for key, value in list(self._runtime_params.items())
+                )
+            )
             # Overwrite parameters given from command line
             self._parameters.update(self._runtime_params)
-
 
         self._replace_parameters(self.__yaml_data)
 
@@ -140,46 +148,66 @@ class Session(object):
                 # print('-\nValue {}: {}\n='.format(value, type(data)))
                 # if isinstance(value, str):
                 # print('replacing {} in {}'.format(key, data))
-                data = re.sub(r"\${%s}"%(key), str(value), data)
+                data = re.sub(r"\${%s}" % (key), str(value), data)
         return data
-
 
     def _parse_windows(self):
         if self.__yaml_data is None:
-            print('parse_windows was called without yaml data loaded.')
+            print("parse_windows was called without yaml data loaded.")
             raise RuntimeError
 
-        if 'windows' in self.__yaml_data:
-            for window in self.__yaml_data['windows']:
-                if 'if' in window:
-                    print('Detected if condition for window ' + window['name'])
-                    if window['if'] not in self._parameters:
-                        print('Skipping window ' + window['name'] + ' because parameter ' +
-                              window['if'] + ' was not found.')
+        if "windows" in self.__yaml_data:
+            for window in self.__yaml_data["windows"]:
+                if "if" in window:
+                    print("Detected if condition for window " + window["name"])
+                    if window["if"] not in self._parameters:
+                        print(
+                            "Skipping window "
+                            + window["name"]
+                            + " because parameter "
+                            + window["if"]
+                            + " was not found."
+                        )
                         continue
-                    elif not check_boolean_field(self._parameters[window['if']]):
-                        print('Skipping window ' + window['name'] + ' because parameter ' +
-                              window['if'] + ' is switched off globally')
+                    elif not check_boolean_field(self._parameters[window["if"]]):
+                        print(
+                            "Skipping window "
+                            + window["name"]
+                            + " because parameter "
+                            + window["if"]
+                            + " is switched off globally"
+                        )
                         continue
                     else:
-                        print('condition fulfilled: {} == {}'
-                              .format(window['if'], self._parameters[window['if']]))
-                if 'unless' in window:
-                    print('Detected unless condition for window ' + window['name'])
-                    if check_boolean_field(self._parameters[window['unless']]):
-                        print('Skipping window ' + window['name'] + ' because parameter ' +
-                              window['unless'] + ' is switched on globally')
+                        print(
+                            "condition fulfilled: {} == {}".format(
+                                window["if"], self._parameters[window["if"]]
+                            )
+                        )
+                if "unless" in window:
+                    print("Detected unless condition for window " + window["name"])
+                    if check_boolean_field(self._parameters[window["unless"]]):
+                        print(
+                            "Skipping window "
+                            + window["name"]
+                            + " because parameter "
+                            + window["unless"]
+                            + " is switched on globally"
+                        )
                         continue
                     else:
-                        print('condition fulfilled: {} == {}'
-                              .format(window['unless'], self._parameters[window['unless']]))
+                        print(
+                            "condition fulfilled: {} == {}".format(
+                                window["unless"], self._parameters[window["unless"]]
+                            )
+                        )
 
                 kwargs = dict()
-                if 'before_commands' in self._common:
-                    kwargs['before_commands'] = self._common['before_commands']
+                if "before_commands" in self._common:
+                    kwargs["before_commands"] = self._common["before_commands"]
 
                 kwargs.update(window)
 
                 self._windows.append(Window(**kwargs))
         else:
-            print('No window section found in session config')
+            print("No window section found in session config")
