@@ -16,9 +16,6 @@ jobs:
           - '3.8'
           - '3.9'
           - '3.10'
-          - 'pypy-3.7'
-          - 'pypy-3.8'
-          - 'pypy-3.9'
     name: Python ${{ matrix.python-version }} sample
     steps:
       - uses: actions/checkout@v3
