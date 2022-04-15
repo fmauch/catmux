@@ -30,5 +30,6 @@ def get_prefix():
 
     return __file__.split("lib")[0]
 
+
 if __name__ == "__main__":
     print(get_prefix())

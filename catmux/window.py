@@ -35,12 +35,12 @@ class Window(object):
     """Class to represent a tmux window structure"""
 
     def __init__(self, **kwargs):
-        """TODO: to be defined1. """
+        """TODO: to be defined1."""
 
-        split_list = kwargs.pop('splits', None)
-        if not split_list and 'commands' in kwargs:
+        split_list = kwargs.pop("splits", None)
+        if not split_list and "commands" in kwargs:
             split_dict = dict()
-            split_dict['commands'] = kwargs.pop('commands')
+            split_dict["commands"] = kwargs.pop("commands")
             split_list = [split_dict]
 
         self.splits = list()
@@ -51,35 +51,37 @@ class Window(object):
             for (key, value) in kwargs.items():
                 setattr(self, key, value)
 
-
     def debug(self):
         """Prints all information about this window"""
-        print('\n----- {} -----'.format(getattr(self, 'name')))
-        if hasattr(self, 'before_commands'):
-            print('before_commands: ')
-            print('\t- ' + '\n\t- '.join(getattr(self, 'before_commands')))
-        print('Splits:')
+        print("\n----- {} -----".format(getattr(self, "name")))
+        if hasattr(self, "before_commands"):
+            print("before_commands: ")
+            print("\t- " + "\n\t- ".join(getattr(self, "before_commands")))
+        print("Splits:")
         for counter, split in enumerate(self.splits):
-            split.debug(name=str(counter), prefix=' ')
+            split.debug(name=str(counter), prefix=" ")
 
     def create(self, session_name, first=False):
         """Creates the window"""
         if not first:
-            tmux.tmux_call(['new-window'])
-        tmux.tmux_call(['rename-window', getattr(self, 'name')])
+            tmux.tmux_call(["new-window"])
+        tmux.tmux_call(["rename-window", getattr(self, "name")])
         for counter, split in enumerate(self.splits):
             if counter > 0:
                 tmux.split()
 
-            if hasattr(self, 'before_commands'):
-                for cmd in getattr(self, 'before_commands'):
+            if hasattr(self, "before_commands"):
+                for cmd in getattr(self, "before_commands"):
                     tmux.send_keys(cmd)
             split.run()
 
-        if hasattr(self, 'layout'):
-            tmux.tmux_call(['select-layout', getattr(self, 'layout')])
+        if hasattr(self, "layout"):
+            tmux.tmux_call(["select-layout", getattr(self, "layout")])
 
-        if hasattr(self, 'delay'):
-            print('Window {} requested delay of {} seconds'
-                    .format(getattr(self, 'name'), getattr(self, 'delay')))
-            time.sleep(getattr(self, 'delay'))
+        if hasattr(self, "delay"):
+            print(
+                "Window {} requested delay of {} seconds".format(
+                    getattr(self, "name"), getattr(self, "delay")
+                )
+            )
+            time.sleep(getattr(self, "delay"))
