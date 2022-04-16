@@ -58,6 +58,9 @@ def parse_arguments(debug=False):
         "-n", "--session_name", default="catmux", help="Name used for the tmux session"
     )
     parser.add_argument(
+        "-L", "--server-name", default="catmux", help="tmux server to use"
+    )
+    parser.add_argument(
         "-t", "--tmux_config", help="This config will be used for the tmux session"
     )
     parser.add_argument(
@@ -84,7 +87,9 @@ def main():
     session_config.init_from_filepath(args.session_config)
 
     try:
-        subprocess.check_call(["tmux", "has-session", "-t", args.session_name])
+        subprocess.check_call(
+            ["tmux", "-t", args.session_name, "has-session", "-L", args.server_name]
+        )
         print(
             'Session with name "{}" already exists. Not overwriting session.'.format(
                 args.session_name
@@ -96,7 +101,7 @@ def main():
         # probably something severely wrong. TODO: This could be done better probably
         pass
 
-    command = ["tmux"]
+    command = ["tmux", "-L", args.server_name]
     if args.tmux_config:
         tmux_config = args.tmux_config
     elif os.path.exists(os.path.expanduser("~/.tmux.conf")):
@@ -118,9 +123,9 @@ def main():
 
     print('Created session "{}"'.format(args.session_name))
 
-    session_config.run()
+    session_config.run(args.server_name)
     if not args.detach:
-        safe_call(["tmux", "attach", "-t", args.session_name])
+        safe_call(["tmux", "-L", args.server_name, "attach", "-t", args.session_name])
 
 
 if __name__ == "__main__":

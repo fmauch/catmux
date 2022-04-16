@@ -81,6 +81,14 @@ If you are not that familiar with tmux: To kill a session, simply type `tmux kil
 terminal window. In the `etc/tmux_default.conf` there is a key-binding for that, see
 `etc/readme_tmux.txt` for details.
 
+### Tmux server to be used
+By default, catmux spawns its own tmux server called `catmux`. Therefore, a simple
+`tmux list-sessions` (or `tmux ls`) will not list the `catmux` session. To list the `catmux`
+session, use `tmux -L catmux list-sessions`. You can change the server's name by specifying the
+`-L <server_name>` parameter to `catmux_create_session`. That mechanism ensures that the environment
+in which `catmux_create_session` is started, will be used inside the catmux session (as long as no
+other session previously exists on that particular tmux server).
+
 ## Migrating from the catkin version of catmux
 With the spread of ROS2, the need for a catkin-independent catmux has emerged.
 Catmux is now a plain python package without the ROS integration.

@@ -27,23 +27,27 @@
 import subprocess
 
 
-def send_keys(command):
-    """Executes a command in the current tmux pane"""
+class TmuxWrapper:
+    """Wrapper for tmux calls"""
 
-    tmux_call(["send-keys", command, "C-m"])
+    def __init__(self, server_name):
+        self.server_name = server_name
 
+    def send_keys(self, command):
+        """Executes a command in the current tmux pane"""
 
-def split():
-    """Splits the current pane into two"""
-    tmux_call(["split-window"])
+        self.tmux_call(["send-keys", command, "C-m"])
 
+    def split(self):
+        """Splits the current pane into two"""
+        self.tmux_call(["split-window"])
 
-def tmux_call(command_list):
-    """Executes a tmux command"""
-    tmux_cmd = ["tmux"] + command_list
+    def tmux_call(self, command_list):
+        """Executes a tmux command"""
+        tmux_cmd = ["tmux", "-L", self.server_name] + command_list
 
-    # print(' '.join(tmux_cmd))
-    _safe_call(tmux_cmd)
+        # print(' '.join(tmux_cmd))
+        _safe_call(tmux_cmd)
 
 
 def _safe_call(cmd_list):
