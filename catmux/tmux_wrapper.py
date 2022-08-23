@@ -33,10 +33,13 @@ class TmuxWrapper:
     def __init__(self, server_name):
         self.server_name = server_name
 
-    def send_keys(self, command):
+    def send_keys(self, command, target_window=None):
         """Executes a command in the current tmux pane"""
 
-        self.tmux_call(["send-keys", command, "C-m"])
+        if target_window:
+            self.tmux_call(["send-keys", "-t", target_window, command, "C-m"])
+        else:
+            self.tmux_call(["send-keys", command, "C-m"])
 
     def split(self):
         """Splits the current pane into two"""
@@ -46,7 +49,7 @@ class TmuxWrapper:
         """Executes a tmux command"""
         tmux_cmd = ["tmux", "-L", self.server_name] + command_list
 
-        # print(' '.join(tmux_cmd))
+        print(' '.join(tmux_cmd))
         _safe_call(tmux_cmd)
 
 

@@ -34,8 +34,11 @@ class Window(object):
 
     """Class to represent a tmux window structure"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, server_name, session_name, **kwargs):
         """TODO: to be defined1."""
+
+        self.server_name = server_name
+        self.session_name = session_name
 
         split_list = kwargs.pop("splits", None)
         if not split_list and "commands" in kwargs:
@@ -61,12 +64,15 @@ class Window(object):
         for counter, split in enumerate(self.splits):
             split.debug(name=str(counter), prefix=" ")
 
-    def create(self, server_name, session_name, first=False):
+    def create(self, first=False):
         """Creates the window"""
-        tmux_wrapper = tmux.TmuxWrapper(server_name=server_name)
+        tmux_wrapper = tmux.TmuxWrapper(server_name=self.server_name)
+        target_window = ":".join([self.session_name, getattr(self, "name")])
         if not first:
-            tmux_wrapper.tmux_call(["new-window"])
-        tmux_wrapper.tmux_call(["rename-window", getattr(self, "name")])
+            tmux_wrapper.tmux_call(["new-window", "-t", self.session_name])
+        tmux_wrapper.tmux_call(
+            ["rename-window", "-t", f"{self.session_name}:$", getattr(self, "name")]
+        )
         for counter, split in enumerate(self.splits):
             if counter > 0:
                 tmux_wrapper.split()
@@ -74,10 +80,10 @@ class Window(object):
             if hasattr(self, "before_commands"):
                 for cmd in getattr(self, "before_commands"):
                     tmux_wrapper.send_keys(cmd)
-            split.run(server_name=server_name)
+            split.run(server_name=self.server_name, target_window=target_window)
 
         if hasattr(self, "layout"):
-            tmux_wrapper.tmux_call(["select-layout", getattr(self, "layout")])
+            tmux_wrapper.tmux_call(["select-layout", "-t", target_window, getattr(self, "layout")])
 
         if hasattr(self, "delay"):
             print(
