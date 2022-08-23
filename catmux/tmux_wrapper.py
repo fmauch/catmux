@@ -49,7 +49,7 @@ class TmuxWrapper:
         """Executes a tmux command"""
         tmux_cmd = ["tmux", "-L", self.server_name] + command_list
 
-        print(' '.join(tmux_cmd))
+        # print(' '.join(tmux_cmd))
         _safe_call(tmux_cmd)
 
 
