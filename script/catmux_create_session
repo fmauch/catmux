@@ -51,12 +51,18 @@ def safe_call(cmd_list):
 def parse_arguments(debug=False):
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Create a new catmux session")
-    parser.add_argument("session_config", help="Session configuration. Should be a yaml-file.")
+    parser.add_argument(
+        "session_config", help="Session configuration. Should be a yaml-file."
+    )
     parser.add_argument(
         "-n", "--session_name", default="catmux", help="Name used for the tmux session"
     )
-    parser.add_argument("-L", "--server-name", default="catmux", help="tmux server to use")
-    parser.add_argument("-t", "--tmux_config", help="This config will be used for the tmux session")
+    parser.add_argument(
+        "-L", "--server-name", default="catmux", help="tmux server to use"
+    )
+    parser.add_argument(
+        "-t", "--tmux_config", help="This config will be used for the tmux session"
+    )
     parser.add_argument(
         "-d", "--detach", action="store_true", help="Start session in detached mode"
     )
@@ -78,7 +84,9 @@ def main():
     args = parse_arguments()
 
     session_config = CatmuxSession(
-        server_name=args.server_name, session_name=args.session_name, runtime_params=args.overwrite
+        server_name=args.server_name,
+        session_name=args.session_name,
+        runtime_params=args.overwrite,
     )
     session_config.init_from_filepath(args.session_config)
 

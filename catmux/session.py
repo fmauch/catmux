@@ -87,7 +87,11 @@ class Session(object):
         tmux_wrapper = tmux.TmuxWrapper(self._server_name)
         if "default_window" in self._common:
             tmux_wrapper.tmux_call(
-                ["select-window", "-t", self._session_name + ":" + self._common["default_window"]]
+                [
+                    "select-window",
+                    "-t",
+                    self._session_name + ":" + self._common["default_window"],
+                ]
             )
 
     def _parse_common(self):
@@ -122,7 +126,8 @@ class Session(object):
         print(
             " - "
             + "\n - ".join(
-                "{} = {}".format(key, value) for key, value in list(self._parameters.items())
+                "{} = {}".format(key, value)
+                for key, value in list(self._parameters.items())
             )
         )
         if self._runtime_params:
@@ -211,6 +216,8 @@ class Session(object):
 
                 kwargs.update(window)
 
-                self._windows.append(Window(self._server_name, self._session_name, **kwargs))
+                self._windows.append(
+                    Window(self._server_name, self._session_name, **kwargs)
+                )
         else:
             print("No window section found in session config")

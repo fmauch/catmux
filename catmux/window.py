@@ -83,7 +83,9 @@ class Window(object):
             split.run(server_name=self.server_name, target_window=target_window)
 
         if hasattr(self, "layout"):
-            tmux_wrapper.tmux_call(["select-layout", "-t", target_window, getattr(self, "layout")])
+            tmux_wrapper.tmux_call(
+                ["select-layout", "-t", target_window, getattr(self, "layout")]
+            )
 
         if hasattr(self, "delay"):
             print(
