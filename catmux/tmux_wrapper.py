@@ -41,9 +41,9 @@ class TmuxWrapper:
         else:
             self.tmux_call(["send-keys", command, "C-m"])
 
-    def split(self):
+    def split(self, target_window):
         """Splits the current pane into two"""
-        self.tmux_call(["split-window"])
+        self.tmux_call(["split-window", "-t", target_window])
 
     def tmux_call(self, command_list):
         """Executes a tmux command"""

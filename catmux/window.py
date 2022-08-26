@@ -75,11 +75,11 @@ class Window(object):
         )
         for counter, split in enumerate(self.splits):
             if counter > 0:
-                tmux_wrapper.split()
+                tmux_wrapper.split(target_window)
 
             if hasattr(self, "before_commands"):
                 for cmd in getattr(self, "before_commands"):
-                    tmux_wrapper.send_keys(cmd)
+                    tmux_wrapper.send_keys(cmd, target_window=target_window)
             split.run(server_name=self.server_name, target_window=target_window)
 
         if hasattr(self, "layout"):
