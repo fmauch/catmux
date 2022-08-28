@@ -83,7 +83,11 @@ def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
-    session_config = CatmuxSession(args.session_name, args.overwrite)
+    session_config = CatmuxSession(
+        server_name=args.server_name,
+        session_name=args.session_name,
+        runtime_params=args.overwrite,
+    )
     session_config.init_from_filepath(args.session_config)
 
     try:
@@ -123,7 +127,7 @@ def main():
 
     print('Created session "{}"'.format(args.session_name))
 
-    session_config.run(args.server_name)
+    session_config.run()
     if not args.detach:
         safe_call(["tmux", "-L", args.server_name, "attach", "-t", args.session_name])
 

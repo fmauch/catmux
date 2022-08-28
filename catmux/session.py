@@ -41,10 +41,11 @@ class Session(object):
 
     """Parser for a config yaml file"""
 
-    def __init__(self, session_name, runtime_params=None):
+    def __init__(self, server_name, session_name, runtime_params=None):
         """TODO: to be defined1."""
 
         self._common = dict()
+        self._server_name = server_name
         self._session_name = session_name
         self._parameters = dict()
         self._runtime_params = self._parse_overwrites(runtime_params)
@@ -70,7 +71,7 @@ class Session(object):
         self._parse_parameters()
         self._parse_windows()
 
-    def run(self, server_name, debug=False):
+    def run(self, debug=False):
         """Runs the loaded session"""
         if len(self._windows) == 0:
             print("No windows to run found")
@@ -78,15 +79,19 @@ class Session(object):
 
         first = True
         for window in self._windows:
-            window.create(server_name, self._session_name, first)
+            window.create(first)
             if debug:
                 window.debug()
             first = False
 
-        tmux_wrapper = tmux.TmuxWrapper(server_name)
+        tmux_wrapper = tmux.TmuxWrapper(self._server_name)
         if "default_window" in self._common:
             tmux_wrapper.tmux_call(
-                ["select-window", "-t", self._common["default_window"]]
+                [
+                    "select-window",
+                    "-t",
+                    self._session_name + ":" + self._common["default_window"],
+                ]
             )
 
     def _parse_common(self):
@@ -211,6 +216,8 @@ class Session(object):
 
                 kwargs.update(window)
 
-                self._windows.append(Window(**kwargs))
+                self._windows.append(
+                    Window(self._server_name, self._session_name, **kwargs)
+                )
         else:
             print("No window section found in session config")
