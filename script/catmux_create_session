@@ -27,10 +27,7 @@
 from __future__ import print_function
 import os
 import subprocess
-import site
 import sys
-
-import rospkg
 
 import argparse
 
