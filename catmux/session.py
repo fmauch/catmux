@@ -85,7 +85,7 @@ class Session(object):
             first = False
 
         tmux_wrapper = tmux.TmuxWrapper(self._server_name)
-        if "default_window" in self._common:
+        if self._common is not None and "default_window" in self._common:
             tmux_wrapper.tmux_call(
                 [
                     "select-window",
@@ -211,7 +211,7 @@ class Session(object):
                         )
 
                 kwargs = dict()
-                if "before_commands" in self._common:
+                if self._common is not None and "before_commands" in self._common:
                     kwargs["before_commands"] = self._common["before_commands"]
 
                 kwargs.update(window)
