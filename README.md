@@ -1,4 +1,6 @@
 # Catmux
+[![codecov](https://codecov.io/gh/fmauch/catmux/branch/master/graph/badge.svg?token=bPcdYrOBRK)](https://codecov.io/gh/fmauch/catmux)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## About
 Catmux is a little helper to run a tmux session with multiple windows and panes with just one
