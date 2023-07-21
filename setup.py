@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="catmux",
-    version="0.3.2",
+    version="0.3.3",
     license="MIT",
     author="Felix Exner",
     author_email="felix_mauch@web.de",
