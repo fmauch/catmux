@@ -26,6 +26,7 @@
 
 from __future__ import print_function
 import os
+import logging
 import subprocess
 import sys
 
@@ -33,6 +34,7 @@ import argparse
 
 from catmux.session import Session as CatmuxSession
 from catmux.prefix import get_prefix
+import catmux.exceptions
 
 
 def safe_call(cmd_list):
@@ -85,7 +87,11 @@ def main():
         session_name=args.session_name,
         runtime_params=args.overwrite,
     )
-    session_config.init_from_filepath(args.session_config)
+    try:
+        session_config.init_from_filepath(args.session_config)
+    except catmux.exceptions.InvalidConfig as err:
+        logging.error(err)
+        sys.exit(1)
 
     try:
         subprocess.check_call(
