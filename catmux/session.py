@@ -177,7 +177,7 @@ class Session(object):
                 if "if" in window:
                     print("Detected if condition for window " + window["name"])
                     try:
-                        if_param = self._parameters[window["unless"]]
+                        if_param = self._parameters[window["if"]]
                         if window["if"] not in self._parameters:
                             print(
                                 "Skipping window "
