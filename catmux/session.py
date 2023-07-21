@@ -29,6 +29,7 @@ import yaml
 
 from catmux.window import Window
 import catmux.tmux_wrapper as tmux
+import catmux.exceptions as cme
 
 
 def check_boolean_field(boolean):
@@ -44,13 +45,15 @@ class Session(object):
     def __init__(self, server_name, session_name, runtime_params=None):
         """TODO: to be defined1."""
 
-        self._common = dict()
         self._server_name = server_name
         self._session_name = session_name
         self._parameters = dict()
         self._runtime_params = self._parse_overwrites(runtime_params)
         self._windows = list()
         self.__yaml_data = None
+
+        self._before_commands = list()
+        self._default_window = None
 
     def init_from_filepath(self, filepath):
         """Initializes the data from a file read from filepath."""
@@ -85,12 +88,12 @@ class Session(object):
             first = False
 
         tmux_wrapper = tmux.TmuxWrapper(self._server_name)
-        if "default_window" in self._common:
+        if self._default_window:
             tmux_wrapper.tmux_call(
                 [
                     "select-window",
                     "-t",
-                    self._session_name + ":" + self._common["default_window"],
+                    self._session_name + ":" + self._default_window,
                 ]
             )
 
@@ -100,7 +103,12 @@ class Session(object):
             raise RuntimeError
 
         if "common" in self.__yaml_data:
-            self._common = self.__yaml_data["common"]
+            common = self.__yaml_data["common"]
+            if "before_commands" in common:
+                self._before_commands = common["before_commands"]
+
+            if "default_window" in common:
+                self._default_window = common["default_window"]
 
     def _parse_overwrites(self, data_string):
         """Separates a comma-separated list of foo=val1,bar=val2 into a dictionary."""
@@ -168,53 +176,67 @@ class Session(object):
             for window in self.__yaml_data["windows"]:
                 if "if" in window:
                     print("Detected if condition for window " + window["name"])
-                    if window["if"] not in self._parameters:
-                        print(
-                            "Skipping window "
-                            + window["name"]
-                            + " because parameter "
-                            + window["if"]
-                            + " was not found."
-                        )
-                        continue
-                    elif not check_boolean_field(self._parameters[window["if"]]):
-                        print(
-                            "Skipping window "
-                            + window["name"]
-                            + " because parameter "
-                            + window["if"]
-                            + " is switched off globally"
-                        )
-                        continue
-                    else:
-                        print(
-                            "condition fulfilled: {} == {}".format(
-                                window["if"], self._parameters[window["if"]]
+                    try:
+                        if_param = self._parameters[window["unless"]]
+                        if window["if"] not in self._parameters:
+                            print(
+                                "Skipping window "
+                                + window["name"]
+                                + " because parameter "
+                                + window["if"]
+                                + " was not found."
                             )
+                            continue
+                        elif not check_boolean_field(if_param):
+                            print(
+                                "Skipping window "
+                                + window["name"]
+                                + " because parameter "
+                                + window["if"]
+                                + " is switched off globally"
+                            )
+                            continue
+                        else:
+                            print(
+                                "condition fulfilled: {} == {}".format(
+                                    window["if"], self._parameters[window["if"]]
+                                )
+                            )
+                    except KeyError:
+                        raise cme.InvalidConfig(
+                            f"Paramater '{window['if']}' not found in parameters."
                         )
                 if "unless" in window:
                     print("Detected unless condition for window " + window["name"])
-                    if check_boolean_field(self._parameters[window["unless"]]):
-                        print(
-                            "Skipping window "
-                            + window["name"]
-                            + " because parameter "
-                            + window["unless"]
-                            + " is switched on globally"
-                        )
-                        continue
-                    else:
-                        print(
-                            "condition fulfilled: {} == {}".format(
-                                window["unless"], self._parameters[window["unless"]]
+                    try:
+                        unless_param = self._parameters[window["unless"]]
+
+                        if check_boolean_field(unless_param):
+                            print(
+                                "Skipping window "
+                                + window["name"]
+                                + " because parameter "
+                                + window["unless"]
+                                + " is switched on globally"
                             )
+                            continue
+                        else:
+                            print(
+                                "condition fulfilled: {} == {}".format(
+                                    window["unless"], self._parameters[window["unless"]]
+                                )
+                            )
+                    except KeyError:
+                        raise cme.InvalidConfig(
+                            f"Paramater '{window['unless']}' not found in parameters."
                         )
 
                 kwargs = dict()
-                if "before_commands" in self._common:
-                    kwargs["before_commands"] = self._common["before_commands"]
+                kwargs["before_commands"] = [cmd for cmd in self._before_commands]
 
                 kwargs.update(window)
+
+                print(kwargs)
 
                 self._windows.append(
                     Window(self._server_name, self._session_name, **kwargs)

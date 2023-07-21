@@ -28,6 +28,7 @@ import time
 
 import catmux.tmux_wrapper as tmux
 from catmux.split import Split
+from catmux.exceptions import InvalidConfig
 
 
 class Window(object):
@@ -41,10 +42,17 @@ class Window(object):
         self.session_name = session_name
 
         split_list = kwargs.pop("splits", None)
-        if not split_list and "commands" in kwargs:
-            split_dict = dict()
-            split_dict["commands"] = kwargs.pop("commands")
-            split_list = [split_dict]
+        if not split_list:
+            if "commands" in kwargs:
+                split_dict = dict()
+                split_dict["commands"] = kwargs.pop("commands")
+                split_list = [split_dict]
+            else:
+                raise InvalidConfig(
+                    f"No splits and no commands given for window '{kwargs['name']}'."
+                )
+
+        print(split_list)
 
         self.splits = list()
         for split_data in split_list:
