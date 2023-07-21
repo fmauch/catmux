@@ -1,3 +1,4 @@
+name: Package
 on:
   workflow_dispatch:
   pull_request:
@@ -6,7 +7,7 @@ on:
       - master
 
 jobs:
-  build:
+  package:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,7 +16,7 @@ jobs:
           - '3.9'
           - '3.10'
           - '3.11'
-    name: Python ${{ matrix.python-version }} sample
+    name: Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -31,14 +32,3 @@ jobs:
           check-wheel-contents dist/*.whl
       - name: "Check long_description"
         run: "python -m twine check dist/*"
-  pre-commit:
-    name: pre-commit
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - uses: pre-commit/action@v3.0.0
-      with:
-        extra_args: --all-files --hook-stage manual
