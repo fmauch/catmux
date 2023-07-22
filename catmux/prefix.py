@@ -24,11 +24,17 @@
 # SOFTWARE.
 # -- END LICENSE BLOCK ------------------------------------------------
 
+import os
+import sys
 from importlib import resources
 
 
 def get_prefix():
     """Returns the path of catmux's resource folder"""
+
+    if sys.version_info.major == 3 and sys.version_info.minor == 9:
+        with resources.files("catmux") as path:
+            return os.path.join(path, "resources")
 
     with resources.path("catmux", "resources") as path:
         return path
