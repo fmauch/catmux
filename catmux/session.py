@@ -61,8 +61,9 @@ class Session(object):
         try:
             self.__yaml_data = yaml.safe_load(open(filepath, "r"))
         except yaml.YAMLError as exc:
-            print("Error while loading config file: %s", exc)
-            print("Loaded file was: %s", filepath)
+            raise cme.InvalidConfig(
+                f"Config file {filepath} is not a valid yaml file:\n{exc}"
+            )
 
         self.init_from_yaml(self.__yaml_data)
 
@@ -102,12 +103,12 @@ class Session(object):
             print("parse_common was called without yaml data loaded.")
             raise RuntimeError
 
-        if "common" in self.__yaml_data:
+        if "common" in self.__yaml_data and self.__yaml_data["common"]:
             common = self.__yaml_data["common"]
-            if "before_commands" in common:
+            if "before_commands" in common and common["before_commands"]:
                 self._before_commands = common["before_commands"]
 
-            if "default_window" in common:
+            if "default_window" in common and common["default_window"]:
                 self._default_window = common["default_window"]
 
     def _parse_overwrites(self, data_string):
@@ -173,6 +174,8 @@ class Session(object):
             raise RuntimeError
 
         if "windows" in self.__yaml_data:
+            if self.__yaml_data["windows"] is None:
+                raise cme.InvalidConfig("The 'windows' block must not be empty.")
             for window in self.__yaml_data["windows"]:
                 if "if" in window:
                     print("Detected if condition for window " + window["name"])
@@ -242,4 +245,4 @@ class Session(object):
                     Window(self._server_name, self._session_name, **kwargs)
                 )
         else:
-            print("No window section found in session config")
+            raise cme.InvalidConfig("No window section found in session config")
