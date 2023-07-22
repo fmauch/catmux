@@ -124,6 +124,10 @@ windows:
       if: show_layouts
       commands:
         - echo "${replacement_param}"
+    - name: bar
+      unless: show_layouts
+      commands:
+        - echo "I will not be printed when layouts are shown"
 """
     session = Session("server", "name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
@@ -142,12 +146,43 @@ def test_split_without_command():
         session.init_from_yaml(yaml.safe_load(CONFIG))
 
 
+def test_empty_config():
+    CONFIG = """foo: bar
+"""
+    session = Session("server", "name")
+    with pytest.raises(catmux.exceptions.InvalidConfig):
+        session.init_from_yaml(yaml.safe_load(CONFIG))
+
+
 def test_empty_windows_block():
     CONFIG = """windows:
 """
     session = Session("server", "name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_yaml(yaml.safe_load(CONFIG))
+
+
+def test_parsing_overwrites():
+    CONFIG = """---
+common:
+  before_commands:
+    - echo "This is a catmux window :)"
+  default_window: some_other_window
+parameters:
+  show_layouts: false
+  replacement_param: world
+windows:
+    - name: foo
+      commands:
+        - echo "bar"
+"""
+    session = Session("server", "name", runtime_params=None)
+    session.init_from_yaml(yaml.safe_load(CONFIG))
+
+    session = Session(
+        "server", "name", runtime_params="show_layouts=true, replacement_param=foobar"
+    )
+    session.init_from_yaml(yaml.safe_load(CONFIG))
 
 
 def test_init_from_file():
@@ -170,3 +205,13 @@ this is something else.
     session = Session("server", "name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_filepath(session_config)
+
+
+def test_parsing_without_yaml():
+    session = Session("server", "name")
+    with pytest.raises(RuntimeError):
+        session._parse_common()
+    with pytest.raises(RuntimeError):
+        session._parse_parameters()
+    with pytest.raises(RuntimeError):
+        session._parse_windows()
