@@ -38,12 +38,12 @@ the same behavior as with the recommended installation method.
 
 ## Usage
 Currently, there is no full-blown documentation, but the example config file in
-`etc/example_session.yaml` gives a detailed insight on possible commands.
+`catmux/resources/example_session.yaml` gives a detailed insight on possible commands.
 
 ### Running the example the most simple way
 After installation, you can run a simple example by calling the following command:
 ```
-catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml
+catmux_create_session $(python3 -m catmux.prefix)/example_session.yaml
 ```
 
 To see further options, simply run it with argument `-h`:
@@ -72,15 +72,15 @@ optional arguments:
 ### Full blown example
 To make use of all catmux features, run the following example command:
 ```
-catmux_create_session $(python3 -m catmux.prefix)/share/catmux/example_session.yaml \
-  --tmux_config $(python3 -m catmux.prefix)/share/catmux/tmux_default.conf \
+catmux_create_session $(python3 -m catmux.prefix)/example_session.yaml \
+  --tmux_config $(python3 -m catmux.prefix)/tmux_default.conf \
   --session_name example_session \
   --overwrite show_layouts=True,replacement_param="new catmux user"
 ```
 
 ### Killing a catmux session
 If you are not that familiar with tmux: To kill a session, simply type `tmux kill-session` in any
-terminal window. In the `etc/tmux_default.conf` there is a key-binding for that, see
+terminal window. In the `catmux/resources/tmux_default.conf` there is a key-binding for that, see
 `etc/readme_tmux.txt` for details.
 
 ### Tmux server to be used

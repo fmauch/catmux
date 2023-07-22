@@ -1,8 +1,8 @@
-"""This module provides the installed prefix of the catmux module"""
+"""This module provides the installed prefix of the catmux resources"""
 # -- BEGIN LICENSE BLOCK ----------------------------------------------
 
 # catmux
-# Copyright (C) 2020  Felix Mauch
+# Copyright (C) 2023  Felix Exner
 # MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,11 +24,14 @@
 # SOFTWARE.
 # -- END LICENSE BLOCK ------------------------------------------------
 
+from importlib import resources
+
 
 def get_prefix():
-    """Returns the installed prefix"""
+    """Returns the path of catmux's resource folder"""
 
-    return __file__.split("lib")[0]
+    with resources.path("catmux", "resources") as path:
+        return path
 
 
 if __name__ == "__main__":
