@@ -77,9 +77,7 @@ class Session(object):
 
     def run(self, debug=False):
         """Runs the loaded session"""
-        if len(self._windows) == 0:
-            print("No windows to run found")
-            return
+        assert len(self._windows) > 0
 
         first = True
         for window in self._windows:
