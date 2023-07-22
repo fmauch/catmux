@@ -2,6 +2,8 @@ import os
 
 from catmux.session import check_boolean_field
 from catmux.tmux_wrapper import _safe_call as safe_call
+from catmux.prefix import get_prefix
+import catmux.resources
 
 
 def test_boolean_field():
@@ -28,3 +30,8 @@ def test_safe_call():
     assert safe_call(["bash", "-c", "exit 0"]) == True
     assert safe_call(["bash", "-c", "exit 1"]) == False
     assert safe_call(["bash", "-c", "return 0"]) == False  #  illegal bash
+
+
+def test_get_prefix():
+    prefix = os.path.join(get_prefix(), "__init__.py")
+    assert prefix == catmux.resources.__file__
