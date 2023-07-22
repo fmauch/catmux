@@ -32,8 +32,9 @@ import sys
 
 import argparse
 
+from importlib import resources
+
 from catmux.session import Session as CatmuxSession
-from catmux.prefix import get_prefix
 import catmux.exceptions
 
 
@@ -116,8 +117,10 @@ def main():
     elif os.path.exists("/etc/tmux.conf"):
         tmux_config = "/etc/tmux.conf"
     else:
-        prefix = get_prefix()
-        tmux_config = os.path.join(prefix, "share", "catmux", "tmux_default.conf")
+        with resources.path(
+            ".".join(["catmux", "resources"]), "tmux_default.conf"
+        ) as catmux_session:
+            tmux_config = catmux_session
 
     print("Using tmux config file: {}".format(tmux_config))
     command += ["-f", tmux_config]

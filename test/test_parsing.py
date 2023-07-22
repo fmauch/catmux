@@ -8,7 +8,6 @@ import tempfile
 import yaml
 
 from catmux.session import Session
-from catmux.prefix import get_prefix
 import catmux.exceptions
 
 
