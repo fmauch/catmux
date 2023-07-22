@@ -179,42 +179,35 @@ class Session(object):
             for window in self.__yaml_data["windows"]:
                 if "if" in window:
                     print("Detected if condition for window " + window["name"])
-                    try:
-                        if_param = self._parameters[window["if"]]
-                        if window["if"] not in self._parameters:
-                            print(
-                                "Skipping window "
-                                + window["name"]
-                                + " because parameter "
-                                + window["if"]
-                                + " was not found."
+                    if window["if"] not in self._parameters:
+                        print(
+                            "Skipping window "
+                            + window["name"]
+                            + " because parameter "
+                            + window["if"]
+                            + " was not found."
+                        )
+                        continue
+                    elif not check_boolean_field(self._parameters[window["if"]]):
+                        print(
+                            "Skipping window "
+                            + window["name"]
+                            + " because parameter "
+                            + window["if"]
+                            + " is switched off globally"
+                        )
+                        continue
+                    else:
+                        print(
+                            "condition fulfilled: {} == {}".format(
+                                window["if"], self._parameters[window["if"]]
                             )
-                            continue
-                        elif not check_boolean_field(if_param):
-                            print(
-                                "Skipping window "
-                                + window["name"]
-                                + " because parameter "
-                                + window["if"]
-                                + " is switched off globally"
-                            )
-                            continue
-                        else:
-                            print(
-                                "condition fulfilled: {} == {}".format(
-                                    window["if"], self._parameters[window["if"]]
-                                )
-                            )
-                    except KeyError:
-                        raise cme.InvalidConfig(
-                            f"Paramater '{window['if']}' not found in parameters."
                         )
                 if "unless" in window:
                     print("Detected unless condition for window " + window["name"])
-                    try:
-                        unless_param = self._parameters[window["unless"]]
 
-                        if check_boolean_field(unless_param):
+                    if window["unless"] in self._parameters:
+                        if check_boolean_field(self._parameters[window["unless"]]):
                             print(
                                 "Skipping window "
                                 + window["name"]
@@ -229,10 +222,6 @@ class Session(object):
                                     window["unless"], self._parameters[window["unless"]]
                                 )
                             )
-                    except KeyError:
-                        raise cme.InvalidConfig(
-                            f"Paramater '{window['unless']}' not found in parameters."
-                        )
 
                 kwargs = dict()
                 kwargs["before_commands"] = [cmd for cmd in self._before_commands]

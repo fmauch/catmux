@@ -106,8 +106,7 @@ windows:
           - echo "left"
 """
     session = Session("server", "name")
-    with pytest.raises(catmux.exceptions.InvalidConfig):
-        session.init_from_yaml(yaml.safe_load(CONFIG))
+    session.init_from_yaml(yaml.safe_load(CONFIG))
 
 
 def test_parameter_replacement():
@@ -118,9 +117,11 @@ def test_parameter_replacement():
     default_window: foobar
 parameters:
     replacement_param: schubidoo
+    show_layouts: true
 
 windows:
     - name: foo
+      if: show_layouts
       commands:
         - echo "${replacement_param}"
 """
