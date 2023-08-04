@@ -120,7 +120,7 @@ def main():
         with resources.path(
             ".".join(["catmux", "resources"]), "tmux_default.conf"
         ) as catmux_session:
-            tmux_config = catmux_session
+            tmux_config = str(catmux_session)
 
     print("Using tmux config file: {}".format(tmux_config))
     command += ["-f", tmux_config]
