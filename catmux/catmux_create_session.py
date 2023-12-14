@@ -111,6 +111,9 @@ def main():
     command = ["tmux", "-L", args.server_name]
     if args.tmux_config:
         tmux_config = args.tmux_config
+        if not os.path.exists(tmux_config):
+            print("Given tmux_config file does not exist")
+            sys.exit(1)
     elif os.path.exists(os.path.expanduser("~/.tmux.conf")):
         tmux_config = os.path.expanduser("~/.tmux.conf")
     elif os.path.exists("/etc/tmux.conf"):
