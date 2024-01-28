@@ -77,7 +77,7 @@ class Window(object):
         tmux_wrapper = tmux.TmuxWrapper(server_name=self.server_name)
         target_window = ":".join([self.session_name, getattr(self, "name")])
         if not first:
-            tmux_wrapper.tmux_call(["new-window", "-t", self.session_name])
+            tmux_wrapper.tmux_call(["new-window", "-t", self.session_name + ":"])
         tmux_wrapper.tmux_call(
             ["rename-window", "-t", f"{self.session_name}:$", getattr(self, "name")]
         )
