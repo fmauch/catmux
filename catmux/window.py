@@ -26,7 +26,8 @@
 """Contains the Window object"""
 import time
 
-import catmux.tmux_wrapper as tmux
+import libtmux
+
 from catmux.split import Split
 from catmux.exceptions import InvalidConfig
 
@@ -35,11 +36,10 @@ class Window(object):
 
     """Class to represent a tmux window structure"""
 
-    def __init__(self, server_name, session_name, **kwargs):
+    def __init__(self, tmux_session, **kwargs):
         """TODO: to be defined1."""
 
-        self.server_name = server_name
-        self.session_name = session_name
+        self.tmux_session = tmux_session
 
         split_list = kwargs.pop("splits", None)
         if not split_list:
@@ -74,26 +74,25 @@ class Window(object):
 
     def create(self, first=False):
         """Creates the window"""
-        tmux_wrapper = tmux.TmuxWrapper(server_name=self.server_name)
-        target_window = ":".join([self.session_name, getattr(self, "name")])
+        window_name = getattr(self, "name")
+        target_window = None
         if not first:
-            tmux_wrapper.tmux_call(["new-window", "-t", self.session_name + ":"])
-        tmux_wrapper.tmux_call(
-            ["rename-window", "-t", f"{self.session_name}:$", getattr(self, "name")]
-        )
+            target_window = self.tmux_session.new_window(window_name)
+        else:
+            target_window = self.tmux_session.windows[0]
+            target_window.rename_window(window_name)
+
         for counter, split in enumerate(self.splits):
             if counter > 0:
-                tmux_wrapper.split(target_window)
+                target_window.split_window()
+            target_pane = target_window.panes[-1]
 
             if hasattr(self, "before_commands"):
                 for cmd in getattr(self, "before_commands"):
-                    tmux_wrapper.send_keys(cmd, target_window=target_window)
-            split.run(server_name=self.server_name, target_window=target_window)
+                    target_pane.send_keys(cmd)
 
         if hasattr(self, "layout"):
-            tmux_wrapper.tmux_call(
-                ["select-layout", "-t", target_window, getattr(self, "layout")]
-            )
+            target_window.select_layout(getattr(self, "layout"))
 
         if hasattr(self, "delay"):
             print(

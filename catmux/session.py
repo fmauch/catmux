@@ -25,10 +25,10 @@
 
 """Contains everything around the config file"""
 import re
+import libtmux
 import yaml
 
 from catmux.window import Window
-import catmux.tmux_wrapper as tmux
 import catmux.exceptions as cme
 
 
@@ -42,11 +42,11 @@ class Session(object):
 
     """Parser for a config yaml file"""
 
-    def __init__(self, server_name, session_name, runtime_params=None):
+    def __init__(self, tmux_session, runtime_params=None):
         """TODO: to be defined1."""
 
-        self._server_name = server_name
-        self._session_name = session_name
+        self.tmux_session = tmux_session
+
         self._parameters = dict()
         self._runtime_params = self._parse_overwrites(runtime_params)
         self._windows = list()
@@ -86,15 +86,11 @@ class Session(object):
                 window.debug()
             first = False
 
-        tmux_wrapper = tmux.TmuxWrapper(self._server_name)
         if self._default_window:
-            tmux_wrapper.tmux_call(
-                [
-                    "select-window",
-                    "-t",
-                    self._session_name + ":" + self._default_window,
-                ]
+            target_window = self.tmux_session.windows.get(
+                window_name=self._default_window
             )
+            target_window.select_window()
 
     def _parse_common(self):
         if self.__yaml_data is None:
@@ -228,8 +224,6 @@ class Session(object):
 
                 print(kwargs)
 
-                self._windows.append(
-                    Window(self._server_name, self._session_name, **kwargs)
-                )
+                self._windows.append(Window(self.tmux_session, **kwargs))
         else:
             raise cme.InvalidConfig("No window section found in session config")

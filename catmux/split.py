@@ -25,8 +25,6 @@
 
 """A split in a tmux session"""
 
-import catmux.tmux_wrapper as tmux
-
 
 class Split(object):
 
@@ -45,9 +43,3 @@ class Split(object):
         if hasattr(self, "commands"):
             print(prefix + "  commands: ")
             print("\t- " + "\n\t- ".join(getattr(self, "commands")))
-
-    def run(self, server_name, target_window=None):
-        "Executes all configured commands" ""
-        tmux_wrapper = tmux.TmuxWrapper(server_name=server_name)
-        for command in getattr(self, "commands"):
-            tmux_wrapper.send_keys(command, target_window)
