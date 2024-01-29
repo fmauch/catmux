@@ -24,7 +24,6 @@
 # SOFTWARE.
 # -- END LICENSE BLOCK ------------------------------------------------
 
-from __future__ import print_function
 import os
 import logging
 import subprocess
@@ -136,7 +135,3 @@ def main():
     session_config.run()
     if not args.detach:
         safe_call(["tmux", "-L", args.server_name, "attach", "-t", args.session_name])
-
-
-if __name__ == "__main__":
-    main()

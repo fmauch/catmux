@@ -16,7 +16,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/fmauch/catmux",
     packages=setuptools.find_packages(),
-    scripts=["script/catmux_create_session"],
+    entry_points={
+        "console_scripts": ["catmux_create_session=catmux.catmux_create_session:main"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
