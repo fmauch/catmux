@@ -57,11 +57,11 @@ parameters:
     show_layouts: true
 
 windows:
-    - name: foo
+    - name: foobar
       if: show_layouts
       commands:
         - echo "${replacement_param}"
-    - name: bar
+    - name: hello
       layout: tiled
       delay: 1
       splits:
@@ -71,23 +71,23 @@ windows:
           - echo "second_split"
 """
     server_name = "my_server"
-    session_name = "my_session"
+    session_name = "foo"
     session = Session(server_name=server_name, session_name=session_name)
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     session.run(debug=True)
     calls = [
-        ["rename-window", "-t", "my_session:$", "foo"],
-        ["send-keys", "-t", "my_session:foo", 'echo "hello"', "C-m"],
-        ["send-keys", "-t", "my_session:foo", 'echo "world"', "C-m"],
-        ["send-keys", "-t", "my_session:foo", 'echo "schubidoo"', "C-m"],
-        ["select-window", "-t", "my_session:foobar"],
-        ["new-window", "-t", "my_session"],
-        ["rename-window", "-t", "my_session:$", "bar"],
-        ["send-keys", "-t", "my_session:bar", 'echo "first_split"', "C-m"],
-        ["split-window", "-t", "my_session:bar"],
-        ["send-keys", "-t", "my_session:bar", 'echo "second_split"', "C-m"],
-        ["select-layout", "-t", "my_session:bar", "tiled"],
+        ["rename-window", "-t", "foo:$", "foobar"],
+        ["send-keys", "-t", "foo:foobar", 'echo "hello"', "C-m"],
+        ["send-keys", "-t", "foo:foobar", 'echo "world"', "C-m"],
+        ["send-keys", "-t", "foo:foobar", 'echo "schubidoo"', "C-m"],
+        ["select-window", "-t", "foo:foobar"],
+        ["new-window", "-t", "foo:"],
+        ["rename-window", "-t", "foo:$", "hello"],
+        ["send-keys", "-t", "foo:hello", 'echo "first_split"', "C-m"],
+        ["split-window", "-t", "foo:hello"],
+        ["send-keys", "-t", "foo:hello", 'echo "second_split"', "C-m"],
+        ["select-layout", "-t", "foo:hello", "tiled"],
     ]
     for call in calls:
         mock_popen.assert_any_call(["tmux", "-L", server_name] + call)
