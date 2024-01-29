@@ -91,6 +91,20 @@ session, use `tmux -L catmux list-sessions`. You can change the server's name by
 in which `catmux_create_session` is started, will be used inside the catmux session (as long as no
 other session previously exists on that particular tmux server).
 
+To make things a bit easier, there is a convenience script installed with this
+package: [`catmux`](script/catmux). It is basically a wrapper around `tmux -L
+<server_name>`. For example, you can
+
+``` bash
+catmux attach # attach to the latest running catmux session
+catmux ls # list current catmux sessions
+catmux kill-session -t example_session # kill session 'target session'
+```
+
+In case you use another tmux server than `catmux`, you can set the environment
+variable `CATMUX_DEFAULT_SERVER` to that name and continue using the `catmux`
+script.
+
 ## Migrating from the catkin version of catmux
 With the spread of ROS2, the need for a catkin-independent catmux has emerged.
 Catmux is now a plain python package without the ROS integration.

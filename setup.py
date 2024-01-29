@@ -19,6 +19,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": ["catmux_create_session=catmux.catmux_create_session:main"]
     },
+    scripts=["script/catmux"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
