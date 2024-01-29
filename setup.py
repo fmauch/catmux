@@ -17,7 +17,7 @@ setuptools.setup(
     url="https://github.com/fmauch/catmux",
     packages=setuptools.find_packages(),
     entry_points={
-        'console_scripts': ['catmux_create_session=catmux.catmux_create_session:main']
+        "console_scripts": ["catmux_create_session=catmux.catmux_create_session:main"]
     },
     classifiers=[
         "Programming Language :: Python :: 3",
