@@ -25,6 +25,8 @@
 
 """A split in a tmux session"""
 
+import libtmux
+
 
 class Split(object):
 
@@ -43,3 +45,8 @@ class Split(object):
         if hasattr(self, "commands"):
             print(prefix + "  commands: ")
             print("\t- " + "\n\t- ".join(getattr(self, "commands")))
+
+    def run(self, parent_pane: libtmux.Pane):
+        "Executes all configured commands" ""
+        for command in getattr(self, "commands"):
+            parent_pane.send_keys(command)

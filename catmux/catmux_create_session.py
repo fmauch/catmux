@@ -111,20 +111,18 @@ def main():
         # If no session with that name can be found, everything is fine...
         pass
 
-    target_session = tmux_server.new_session(args.session_name, attach=False)
-
     session_config = CatmuxSession(
-        tmux_session=target_session,
+        session_name=args.session_name,
         runtime_params=args.overwrite,
     )
     try:
         session_config.init_from_filepath(args.session_config)
         print(f'Created session "{args.session_name}"')
 
-        session_config.run()
+        target_session = session_config.run(tmux_server)
         if not args.detach:
             tmux_server.attach_session(target_session=args.session_name)
     except Exception as err:
         logging.error(err)
-        target_session.kill_session()
+        tmux_server.kill_session(args.session_name)
         sys.exit(1)

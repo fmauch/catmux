@@ -36,10 +36,8 @@ class Window(object):
 
     """Class to represent a tmux window structure"""
 
-    def __init__(self, tmux_session, **kwargs):
+    def __init__(self, **kwargs):
         """TODO: to be defined1."""
-
-        self.tmux_session = tmux_session
 
         split_list = kwargs.pop("splits", None)
         if not split_list:
@@ -72,14 +70,14 @@ class Window(object):
         for counter, split in enumerate(self.splits):
             split.debug(name=str(counter), prefix=" ")
 
-    def create(self, first=False):
+    def run(self, parent_session: libtmux.Session, first=False):
         """Creates the window"""
         window_name = getattr(self, "name")
         target_window = None
         if not first:
-            target_window = self.tmux_session.new_window(window_name)
+            target_window = parent_session.new_window(window_name)
         else:
-            target_window = self.tmux_session.windows[0]
+            target_window = parent_session.windows[0]
             target_window.rename_window(window_name)
 
         for counter, split in enumerate(self.splits):
@@ -91,6 +89,7 @@ class Window(object):
                 for cmd in getattr(self, "before_commands"):
                     target_pane.send_keys(cmd)
 
+            split.run(target_pane)
         if hasattr(self, "layout"):
             target_window.select_layout(getattr(self, "layout"))
 
