@@ -12,7 +12,7 @@ class CustomAssertions:
         if not os.path.lexists(path):
             raise AssertionError('File not exists in path "' + path + '".')
 
-    def assert_cmd_in_output(self, cmd: str, output: list[str]):
+    def assert_cmd_in_output(self, cmd: str, output: list):
         merged_output = "\n".join(output)
         if not any(cmd in x for x in output):
             raise AssertionError(
