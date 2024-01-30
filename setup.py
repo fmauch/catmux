@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="catmux",
-    version="0.3.4",
+    version="0.3.6",
     license="MIT",
     author="Felix Exner",
     author_email="felix_mauch@web.de",
@@ -19,6 +19,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": ["catmux_create_session=catmux.catmux_create_session:main"]
     },
+    scripts=["script/catmux"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

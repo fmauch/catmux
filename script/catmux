@@ -1,0 +1,9 @@
+#!/bin/bash
+# This script serves as an entry point to use the `catmux` command similar to
+# the `tmux` command. Since catmux starts its sessions on its own server by
+# default this script should provide a simple alternative to interact with
+# catmux sessions easily.
+
+TMUX_SERVER="${CATMUX_DEFAULT_SERVER:-catmux}"
+
+tmux -L $TMUX_SERVER $@
