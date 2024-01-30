@@ -5,6 +5,14 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+test_deps = [
+    "pytest",
+    "pyfakefs",
+]
+extras = {
+    "test": test_deps,
+}
+
 setuptools.setup(
     name="catmux",
     version="0.3.6",
@@ -26,6 +34,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=["pyyaml", "libtmux"],
+    tests_require=test_deps,
+    extras_require=extras,
     python_requires=">=3.7",
     package_data={"catmux.resources": ["*.yaml", "*.txt", "*.conf"]},
 )
