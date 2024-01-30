@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest-cov codecov
-          pip install .[test]
+          python setup.py develop easy_install "catmux[test]"
       - name: Test with pytest
         run: |
           pytest --cov=catmux --cov-report=xml .
