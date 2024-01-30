@@ -25,7 +25,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pyyaml"],
+    install_requires=["pyyaml", "libtmux"],
     python_requires=">=3.7",
     package_data={"catmux.resources": ["*.yaml", "*.txt", "*.conf"]},
 )

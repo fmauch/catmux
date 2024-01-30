@@ -1,53 +1,35 @@
-import subprocess
-from unittest import mock
+import unittest
 
+import libtmux
 import yaml
 
-import catmux.tmux_wrapper as tmw
 from catmux.split import Split as Split
 from catmux.session import Session
 
 
-@mock.patch("subprocess.check_output")
-def test_tmux_wrapper(mock_popen):
-    server_name = "my_server"
-    wrapper = tmw.TmuxWrapper(server_name)
+class CustomAssertions:
+    def assertFileExists(self, path):
+        if not os.path.lexists(path):
+            raise AssertionError('File not exists in path "' + path + '".')
 
-    send_keys = "b"
-    wrapper.send_keys(send_keys)
-    mock_popen.assert_called_once_with(
-        ["tmux", "-L", server_name, "send-keys", send_keys, "C-m"]
-    )
-    mock_popen.reset_mock()
-
-    wrapper.send_keys(send_keys, target_window="foobar")
-    mock_popen.assert_called_once_with(
-        ["tmux", "-L", server_name, "send-keys", "-t", "foobar", send_keys, "C-m"]
-    )
-    mock_popen.reset_mock()
-
-    wrapper.split(target_window="foobar")
-    mock_popen.assert_called_once_with(
-        ["tmux", "-L", server_name, "split-window", "-t", "foobar"]
-    )
-    mock_popen.reset_mock()
+    def assert_cmd_in_output(self, cmd: str, output: list):
+        merged_output = "\n".join(output)
+        if not any(cmd in x for x in output):
+            raise AssertionError(
+                f"{cmd} is not in output. Output was \n{merged_output}"
+            )
 
 
-@mock.patch("subprocess.check_output")
-def test_run_split(mock_popen):
-    server_name = "my_server"
+class CatmuxFullTest(unittest.TestCase, CustomAssertions):
+    def setUp(self):
+        self.server_name = "catmux_test"
+        self.tmux_server = libtmux.Server(socket_name=self.server_name)
 
-    split_data = {"commands": ["echo 'hello'", "echo 'world'"]}
-    split = Split(**split_data)
-    split.run(server_name)
+    def tearDown(self):
+        self.tmux_server.kill_server()
 
-    for cmd in split_data["commands"]:
-        mock_popen.assert_any_call(["tmux", "-L", server_name, "send-keys", cmd, "C-m"])
-
-
-@mock.patch("subprocess.check_output")
-def test_full_circle(mock_popen):
-    CONFIG = """common:
+    def test_full_circle(self):
+        CONFIG = """common:
     before_commands:
         - echo "hello"
         - echo "world"
@@ -70,24 +52,30 @@ windows:
         - commands:
           - echo "second_split"
 """
-    server_name = "my_server"
-    session_name = "foo"
-    session = Session(server_name=server_name, session_name=session_name)
-    session.init_from_yaml(yaml.safe_load(CONFIG))
+        session_name = "foo"
+        session = Session(session_name=session_name)
+        session.init_from_yaml(yaml.safe_load(CONFIG))
 
-    session.run(debug=True)
-    calls = [
-        ["rename-window", "-t", "foo:$", "foobar"],
-        ["send-keys", "-t", "foo:foobar", 'echo "hello"', "C-m"],
-        ["send-keys", "-t", "foo:foobar", 'echo "world"', "C-m"],
-        ["send-keys", "-t", "foo:foobar", 'echo "schubidoo"', "C-m"],
-        ["select-window", "-t", "foo:foobar"],
-        ["new-window", "-t", "foo:"],
-        ["rename-window", "-t", "foo:$", "hello"],
-        ["send-keys", "-t", "foo:hello", 'echo "first_split"', "C-m"],
-        ["split-window", "-t", "foo:hello"],
-        ["send-keys", "-t", "foo:hello", 'echo "second_split"', "C-m"],
-        ["select-layout", "-t", "foo:hello", "tiled"],
-    ]
-    for call in calls:
-        mock_popen.assert_any_call(["tmux", "-L", server_name] + call)
+        session.run(parent_server=self.tmux_server, debug=True)
+
+        # This would throw an ObjectNotFound error when the session doesn't exist
+        tmux_session = self.tmux_server.sessions.get(session_name=session_name)
+        win_foobar = tmux_session.windows.get(window_name="foobar")
+        foobar_out = win_foobar.panes[0].capture_pane(start=-10)
+        win_hello = tmux_session.windows.get(window_name="hello")
+        hello_out_0 = win_hello.panes[0].capture_pane(start=-10)
+        hello_out_1 = win_hello.panes[1].capture_pane(start=-10)
+
+        self.assertEqual(len(win_foobar.panes), 1)
+        self.assert_cmd_in_output('echo "hello"', foobar_out)
+        self.assert_cmd_in_output('echo "world"', foobar_out)
+        self.assert_cmd_in_output('echo "schubidoo"', foobar_out)
+
+        self.assertEqual(len(win_hello.panes), 2)
+        self.assert_cmd_in_output('echo "hello"', hello_out_0)
+        self.assert_cmd_in_output('echo "world"', hello_out_0)
+        self.assert_cmd_in_output('echo "first_split"', hello_out_0)
+
+        self.assert_cmd_in_output('echo "hello"', hello_out_1)
+        self.assert_cmd_in_output('echo "world"', hello_out_1)
+        self.assert_cmd_in_output('echo "second_split"', hello_out_1)

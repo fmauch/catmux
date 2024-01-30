@@ -5,10 +5,16 @@ import pytest
 
 from importlib import resources
 import tempfile
+import libtmux
 import yaml
 
 from catmux.session import Session
 import catmux.exceptions
+
+
+@pytest.fixture
+def tmux_server():
+    return libtmux.Server(socket_name="catmux_parsing_tests")
 
 
 def test_common_block():
@@ -23,7 +29,7 @@ windows:
           - echo "bar"
 """
 
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     assert session._before_commands == ['echo "hello"', 'echo "world"']
@@ -41,7 +47,7 @@ def test_no_common_block():
         - commands:
           - echo "left"
 """
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     assert len(session._before_commands) == 0
@@ -60,7 +66,7 @@ windows:
         - commands:
           - echo "left"
 """
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     assert len(session._before_commands) == 0
@@ -80,7 +86,7 @@ windows:
         - commands:
           - echo "left"
 """
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     assert len(session._before_commands) == 0
@@ -105,7 +111,7 @@ windows:
         - commands:
           - echo "left"
 """
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
 
@@ -129,7 +135,7 @@ windows:
       commands:
         - echo "I will not be printed when layouts are shown"
 """
-    session = Session("server", "name")
+    session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     assert session._parameters["replacement_param"] == "schubidoo"
@@ -141,7 +147,7 @@ def test_split_without_command():
     - name: foo
       layout: tiled
 """
-    session = Session("server", "name")
+    session = Session("name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_yaml(yaml.safe_load(CONFIG))
 
@@ -149,7 +155,7 @@ def test_split_without_command():
 def test_empty_config():
     CONFIG = """foo: bar
 """
-    session = Session("server", "name")
+    session = Session("name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_yaml(yaml.safe_load(CONFIG))
 
@@ -157,7 +163,7 @@ def test_empty_config():
 def test_empty_windows_block():
     CONFIG = """windows:
 """
-    session = Session("server", "name")
+    session = Session("name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_yaml(yaml.safe_load(CONFIG))
 
@@ -176,11 +182,11 @@ windows:
       commands:
         - echo "bar"
 """
-    session = Session("server", "name", runtime_params=None)
+    session = Session("name", runtime_params=None)
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
     session = Session(
-        "server", "name", runtime_params="show_layouts=true, replacement_param=foobar"
+        "name", runtime_params="show_layouts=true, replacement_param=foobar"
     )
     session.init_from_yaml(yaml.safe_load(CONFIG))
 
@@ -189,7 +195,7 @@ def test_init_from_file():
     with resources.path(
         ".".join(["catmux", "resources"]), "example_session.yaml"
     ) as catmux_session:
-        session = Session("server", "name")
+        session = Session("name")
         session.init_from_filepath(catmux_session)
 
 
@@ -202,13 +208,13 @@ this is something else.
     with os.fdopen(fd, "w") as f:
         f.write(CONFIG)
 
-    session = Session("server", "name")
+    session = Session("name")
     with pytest.raises(catmux.exceptions.InvalidConfig):
         session.init_from_filepath(session_config)
 
 
 def test_parsing_without_yaml():
-    session = Session("server", "name")
+    session = Session("name")
     with pytest.raises(RuntimeError):
         session._parse_common()
     with pytest.raises(RuntimeError):

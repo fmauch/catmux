@@ -25,10 +25,10 @@
 
 """Contains everything around the config file"""
 import re
+import libtmux
 import yaml
 
 from catmux.window import Window
-import catmux.tmux_wrapper as tmux
 import catmux.exceptions as cme
 
 
@@ -42,11 +42,10 @@ class Session(object):
 
     """Parser for a config yaml file"""
 
-    def __init__(self, server_name, session_name, runtime_params=None):
+    def __init__(self, session_name: str, runtime_params=None):
         """TODO: to be defined1."""
+        self.session_name = session_name
 
-        self._server_name = server_name
-        self._session_name = session_name
         self._parameters = dict()
         self._runtime_params = self._parse_overwrites(runtime_params)
         self._windows = list()
@@ -75,26 +74,24 @@ class Session(object):
         self._parse_parameters()
         self._parse_windows()
 
-    def run(self, debug=False):
+    def run(self, parent_server: libtmux.Server, debug=False):
         """Runs the loaded session"""
         assert len(self._windows) > 0
 
+        tmux_session = parent_server.new_session(self.session_name, attach=False)
+
         first = True
         for window in self._windows:
-            window.create(first)
+            window.run(tmux_session, first)
             if debug:
                 window.debug()
             first = False
 
-        tmux_wrapper = tmux.TmuxWrapper(self._server_name)
         if self._default_window:
-            tmux_wrapper.tmux_call(
-                [
-                    "select-window",
-                    "-t",
-                    self._session_name + ":" + self._default_window,
-                ]
-            )
+            target_window = tmux_session.windows.get(window_name=self._default_window)
+            target_window.select_window()
+
+        return tmux_session
 
     def _parse_common(self):
         if self.__yaml_data is None:
@@ -228,8 +225,6 @@ class Session(object):
 
                 print(kwargs)
 
-                self._windows.append(
-                    Window(self._server_name, self._session_name, **kwargs)
-                )
+                self._windows.append(Window(**kwargs))
         else:
             raise cme.InvalidConfig("No window section found in session config")

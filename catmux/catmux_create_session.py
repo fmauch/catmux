@@ -33,6 +33,8 @@ import argparse
 
 from importlib import resources
 
+import libtmux
+
 from catmux.session import Session as CatmuxSession
 import catmux.exceptions
 
@@ -82,33 +84,6 @@ def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
-    session_config = CatmuxSession(
-        server_name=args.server_name,
-        session_name=args.session_name,
-        runtime_params=args.overwrite,
-    )
-    try:
-        session_config.init_from_filepath(args.session_config)
-    except catmux.exceptions.InvalidConfig as err:
-        logging.error(err)
-        sys.exit(1)
-
-    try:
-        subprocess.check_call(
-            ["tmux", "-L", args.server_name, "has-session", "-t", args.session_name]
-        )
-        print(
-            'Session with name "{}" already exists. Not overwriting session.'.format(
-                args.session_name
-            )
-        )
-        sys.exit(0)
-    except subprocess.CalledProcessError:
-        # When has-session returns non-zero exit code, the session already exists or there is
-        # probably something severely wrong. TODO: This could be done better probably
-        pass
-
-    command = ["tmux", "-L", args.server_name]
     if args.tmux_config:
         tmux_config = args.tmux_config
         if not os.path.exists(tmux_config):
@@ -123,18 +98,31 @@ def main():
             ".".join(["catmux", "resources"]), "tmux_default.conf"
         ) as catmux_session:
             tmux_config = str(catmux_session)
-
     print("Using tmux config file: {}".format(tmux_config))
-    command += ["-f", tmux_config]
 
-    command += ["new-session", "-s", args.session_name]
-    command.append("-d")
-    print(" ".join(command))
-    if not safe_call(command):
+    tmux_server = libtmux.Server(args.server_name, config_file=tmux_config)
+    try:
+        tmux_server.sessions.get(session_name=args.session_name)
+        print(
+            f'Session with name "{args.session_name}" already exists. Not overwriting session.'
+        )
         sys.exit(1)
+    except libtmux.exc.ObjectDoesNotExist:
+        # If no session with that name can be found, everything is fine...
+        pass
 
-    print('Created session "{}"'.format(args.session_name))
+    session_config = CatmuxSession(
+        session_name=args.session_name,
+        runtime_params=args.overwrite,
+    )
+    try:
+        session_config.init_from_filepath(args.session_config)
+        print(f'Created session "{args.session_name}"')
 
-    session_config.run()
-    if not args.detach:
-        safe_call(["tmux", "-L", args.server_name, "attach", "-t", args.session_name])
+        target_session = session_config.run(tmux_server)
+        if not args.detach:
+            tmux_server.attach_session(target_session=args.session_name)
+    except Exception as err:
+        logging.error(err)
+        tmux_server.kill_session(args.session_name)
+        sys.exit(1)
