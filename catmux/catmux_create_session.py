@@ -36,17 +36,6 @@ from importlib import resources
 import libtmux
 
 from catmux.session import Session as CatmuxSession
-import catmux.exceptions
-
-
-def safe_call(cmd_list):
-    """Makes a subprocess check_call and outputs a clear error message on failure and then exits"""
-    try:
-        subprocess.check_output(cmd_list)
-        return True
-    except subprocess.CalledProcessError as err_thrown:
-        print('Error while calling "%s"', err_thrown.cmd)
-        return False
 
 
 def parse_arguments(debug=False):
@@ -80,46 +69,70 @@ def parse_arguments(debug=False):
     return args
 
 
+def resolve_tmux_config_path(tmux_config: str) -> str:
+    """
+    Determine the correct tmux config to use. Uses the following priority
+    - If a path is passed during runtime, use that one
+    - If ~/.tmux.conf exists, use that one
+    - If /etc/tmux.conf exists, use that one
+    - Fallback to this package's example configuration
+    """
+    if not tmux_config:
+        if os.path.exists(os.path.expanduser("~/.tmux.conf")):
+            tmux_config = os.path.expanduser("~/.tmux.conf")
+        elif os.path.exists("/etc/tmux.conf"):
+            tmux_config = "/etc/tmux.conf"
+        else:
+            with resources.path(
+                ".".join(["catmux", "resources"]), "tmux_default.conf"
+            ) as catmux_session:
+                tmux_config = str(catmux_session)
+    if not os.path.exists(tmux_config):
+        raise OSError(f"Given tmux_config file at '{tmux_config}' does not exist")
+    return tmux_config
+
+
+def check_for_existing_session(tmux_server: libtmux.Server, session_name: str) -> bool:
+    try:
+        tmux_server.sessions.get(session_name=session_name)
+        return True
+    except libtmux.exc.ObjectDoesNotExist:
+        # If no session with that name can be found, everything is fine...
+        return False
+    raise RuntimeError()
+
+
+def create_session(
+    tmux_server: libtmux.Server, session_config: str, session_name: str, overwrites: str
+) -> CatmuxSession:
+    session = CatmuxSession(
+        session_name=session_name,
+        runtime_params=overwrites,
+    )
+    session.init_from_filepath(session_config)
+
+    return session.run(tmux_server)
+
+
 def main():
     """Creates a new tmux session if it does not yet exist"""
     args = parse_arguments()
 
-    if args.tmux_config:
-        tmux_config = args.tmux_config
-        if not os.path.exists(tmux_config):
-            print("Given tmux_config file does not exist")
-            sys.exit(1)
-    elif os.path.exists(os.path.expanduser("~/.tmux.conf")):
-        tmux_config = os.path.expanduser("~/.tmux.conf")
-    elif os.path.exists("/etc/tmux.conf"):
-        tmux_config = "/etc/tmux.conf"
-    else:
-        with resources.path(
-            ".".join(["catmux", "resources"]), "tmux_default.conf"
-        ) as catmux_session:
-            tmux_config = str(catmux_session)
-    print("Using tmux config file: {}".format(tmux_config))
+    tmux_config = resolve_tmux_config_path(args.tmux_config)
+    print(f"Using tmux config file: {tmux_config}")
 
     tmux_server = libtmux.Server(args.server_name, config_file=tmux_config)
-    try:
-        tmux_server.sessions.get(session_name=args.session_name)
+
+    if check_for_existing_session(tmux_server, args.session_name):
         print(
             f'Session with name "{args.session_name}" already exists. Not overwriting session.'
         )
         sys.exit(1)
-    except libtmux.exc.ObjectDoesNotExist:
-        # If no session with that name can be found, everything is fine...
-        pass
 
-    session_config = CatmuxSession(
-        session_name=args.session_name,
-        runtime_params=args.overwrite,
-    )
     try:
-        session_config.init_from_filepath(args.session_config)
-        print(f'Created session "{args.session_name}"')
-
-        target_session = session_config.run(tmux_server)
+        create_session(
+            tmux_server, args.session_config, args.session_name, args.overwrite
+        )
         if not args.detach:
             tmux_server.attach_session(target_session=args.session_name)
     except Exception as err:

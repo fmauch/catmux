@@ -26,6 +26,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=["pyyaml", "libtmux"],
+    tests_require=[
+        "pytest",
+        "pyfakefs",
+    ],
     python_requires=">=3.7",
     package_data={"catmux.resources": ["*.yaml", "*.txt", "*.conf"]},
 )
