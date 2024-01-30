@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 test_deps = [
     "pytest",
-    "pyflakefs",
+    "pyfakefs",
 ]
 extras = {
     "test": test_deps,
