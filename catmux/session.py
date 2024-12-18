@@ -70,8 +70,8 @@ class Session(object):
         """Initialize config directly by an already loaded yaml structure."""
 
         self.__yaml_data = yaml_data
-        self._parse_common()
         self._parse_parameters()
+        self._parse_common()
         self._parse_windows()
 
     def run(self, parent_server: libtmux.Server, debug=False):
@@ -101,10 +101,25 @@ class Session(object):
         if "common" in self.__yaml_data and self.__yaml_data["common"]:
             common = self.__yaml_data["common"]
             if "before_commands" in common and common["before_commands"]:
-                self._before_commands = common["before_commands"]
+                # self._before_commands = common["before_commands"]
+                self._parse_before_commands(common["before_commands"])
 
             if "default_window" in common and common["default_window"]:
                 self._default_window = common["default_window"]
+
+    def _parse_before_commands(self, commands):
+        command_list = []
+        for command in commands:
+            if isinstance(command, str):
+                command_list.append(command)
+            elif isinstance(command, dict):
+                conditional_param = command.get("if")
+                print(conditional_param)
+                if conditional_param not in self._parameters:
+                    raise RuntimeError
+                elif self._parameters[conditional_param]:
+                    command_list.append(command)
+        self._before_commands = command_list
 
     def _parse_overwrites(self, data_string):
         """Separates a comma-separated list of foo=val1,bar=val2 into a dictionary."""

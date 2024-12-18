@@ -93,6 +93,29 @@ windows:
     assert session._default_window == None
 
 
+def test_conditional_before_commands():
+    CONFIG = """common:
+    before_commands:
+    - if: param_true
+      command: echo "true"
+    - if: param_false_
+      command: echo "false"
+windows:
+    - name: left-right
+      splits:
+        - commands:
+          - echo "left"
+    - name: foo
+      splits:
+        - commands:
+          - echo "left"
+"""
+    session = Session("name")
+    session.init_from_yaml(yaml.safe_load(CONFIG))
+
+    assert len(session._before_commands) == 1
+
+
 def test_missing_parameter_for_if_unless():
     CONFIG = """common:
     before_commands:
