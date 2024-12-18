@@ -122,7 +122,7 @@ class Session(object):
                         + " was not found."
                     )
                 elif self._parameters[conditional_param]:
-                    command_list.append(command)
+                    command_list.append(command.get("command"))
         self._before_commands = command_list
 
     def _parse_overwrites(self, data_string):
