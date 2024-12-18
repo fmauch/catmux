@@ -116,7 +116,11 @@ class Session(object):
                 conditional_param = command.get("if")
                 print(conditional_param)
                 if conditional_param not in self._parameters:
-                    raise RuntimeError
+                    print(
+                        "Skipping command because parameter "
+                        + conditional_param
+                        + " was not found."
+                    )
                 elif self._parameters[conditional_param]:
                     command_list.append(command)
         self._before_commands = command_list
