@@ -94,21 +94,22 @@ windows:
 
 
 def test_conditional_before_commands():
-    CONFIG = """common:
-    before_commands:
+    CONFIG = """---
+parameters:
+    param_true: true
+    param_false: false
+common:
+  before_commands:
     - if: param_true
       command: echo "true"
     - if: param_false_
       command: echo "false"
+    - if: param_does_not_exist
+      command: echo "missing"
 windows:
-    - name: left-right
-      splits:
-        - commands:
-          - echo "left"
     - name: foo
-      splits:
-        - commands:
-          - echo "left"
+      commands:
+        - echo "bar"
 """
     session = Session("name")
     session.init_from_yaml(yaml.safe_load(CONFIG))
