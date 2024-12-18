@@ -1,18 +1,21 @@
 ---
+parameters:
+  # Parameters specified here can be used below and they can be overwritten at runtime
+  show_layouts: false # This parameter is used together with the if flag below
+  conditional_command: false
+  replacement_param: world\! # Parameters can also be used as replacement templates
+
 common:
   # before_commands will be executed in each pane before doing anything else. Use this e.g. for
   #   - sourcing an environment
   #   - ssh-ing to another machine
   before_commands:
     - echo "This is a catmux window :)" # before commands can be specified global and per window
+    - if: conditional_command
+      command: echo "This is conditional"
 
   # The default window will be the one displayed when first connecting to the tmux session
   default_window: some_other_window
-parameters:
-  # Parameters specified here can be used below and they can be overwritten at runtime
-  show_layouts: false # This parameter is used together with the if flag below
-  replacement_param: world\! # Parameters can also be used as replacement templates
-
 # Everything will be opened in windows. Windows can have multiple splits.
 windows:
   - name: tiled
